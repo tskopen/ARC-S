@@ -1,34 +1,16 @@
-#include "flash.h"
+#define FLASH_CS   10
+#define FLASH_CLK  11
+#define FLASH_MISO 13
+#define FLASH_MOSI 14
 
-Preferences preferences;
+SPIClass spiFlash(VSPI); // SPI3
 
 void setupFlash() {
-  // Open Preferences with my-app namespace. Each application module, library, etc
-  // has to use a namespace name to prevent key name collisions. We will open storage in
-  // RW-mode (second parameter has to be false).
-  // Note: Namespace name is limited to 15 chars.
-  preferences.begin("my-app", false);
+  pinMode(FLASH_CS, OUTPUT);
+  digitalWrite(FLASH_CS, HIGH);
 
-  // Remove all preferences under the opened namespace
-  //preferences.clear();
+  spiFlash.begin(FLASH_CLK, FLASH_MISO, FLASH_MOSI, FLASH_CS);
 
-  // Or remove the counter key only
-  //preferences.remove("counter");
-
-  // Get the counter value, if the key does not exist, return a default value of 0
-  // Note: Key name is limited to 15 chars.
-  unsigned int counter = preferences.getUInt("counter", 0);
-
-  // Increase counter by 1
-  counter++;
-
-  // Print the counter to Serial Monitor
-  Serial.printf("Current counter value: %u\n", counter);
-
-  // Store the counter to the Preferences
-  preferences.putUInt("counter", counter);
-
-  // Close the Preferences
-  preferences.end();
-
+  Serial.println("External flash SPI bus ready");
 }
+
