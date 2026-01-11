@@ -1,7 +1,6 @@
-# Experimental Ground Station
+# Experimental Flight Computer
 
-This project is a Python-based ground station for reading and visualizing serial data from sensors. It uses DearPyGui to plot real-time data.
-
+This project is a Software impletementation of a flight computer for the ARC-S flight computer.
 ## Features
 
 - Reads serial data from a connected device
