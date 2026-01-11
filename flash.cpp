@@ -1,7 +1,7 @@
-#define FLASH_CS   10
-#define FLASH_CLK  11
-#define FLASH_MISO 13
-#define FLASH_MOSI 14
+#define FLASH_CS   36
+#define FLASH_CLK  35
+#define FLASH_MISO 37
+#define FLASH_MOSI 39
 
 SPIClass spiFlash(VSPI); // SPI3
 

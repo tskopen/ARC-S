@@ -1,6 +1,8 @@
 #include <sensorfusion.h>
 #include <servos.h>
 #include "flash.h"
+#include "sdcard.h"
+
 #include "FlightLoraRadio.cpp"
 
 
@@ -14,16 +16,6 @@ void setup() {
   SPI.beginTransaction(SPISettings(14000000, MSBFIRST, SPI_MODE0)); 
 
 
-  pinMode(lora5MOSI, OUTPUT);
-
-
-  pinMode(lora7MISO, INPUT);
-
-
-  pinMode(lora6SCK,OUTPUT);
-
-
-  pinMode(lora8CSN,OUTPUT);
 
 
   IMU.begin();
