@@ -56,11 +56,13 @@
 
 
 void readRawSensorData(){
-  if (IMU.accelerationAvailable()) {
+  if (IMU.accelerationAvailable()) 
+  {
     IMU.readAcceleration(gForceAccelerationXAxis, gForceAccelerationYAxis, gForceAccelerationZAxis);
   }
 
-  if (IMU.gyroscopeAvailable()) {
+  if (IMU.gyroscopeAvailable()) 
+  {
     IMU.readGyroscope(gyroAccelerationXAxis, gyroAccelerationYAxis, gyroAccelerationZAxis);
   }
 

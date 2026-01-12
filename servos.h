@@ -3,7 +3,8 @@
 
 #include <ESP32Servo.h>
 
-struct AxisServo {
+struct AxisServo 
+{
   String name;           // Label (e.g., "+X")
   Servo servo;           // Servo object
   int pin;               // GPIO pin

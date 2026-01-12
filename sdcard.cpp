@@ -1,46 +1,42 @@
-#include "flash.h"
-
+#include "sdcard.h"
+#include <SPI.h>
+#include <SD.h>
 Preferences preferences;
 
-void setupSDCard() {
-  SPI.begin(SDCardCLK, SDCardMISO, SDCardMOSI, SDCardCS);
-  //Pins are IO#
-
-  int SDCardCS = 18;
-  int SDCardCLK = 35;
-  int SDCardMISO = 12;
-  int SDCardMOSI = 16;
-
-  pinMode(SDCardMOSI, OUTPUT);
+#define SDCardCS    18;
+#define SDCardCLK   35;
+#define SDCardMISO  12;
+#define SDCardMOSI  16;
+void setupSDCard() 
+  {
+    SPI.begin(SDCardCLK, SDCardMISO, SDCardMOSI, SDCardCS);
+    //Pins are IO#
 
 
-  pinMode(SDCardMISO, INPUT);
+    pinMode(SDCardMOSI, OUTPUT);
 
 
-  pinMode(SDCardCLK, OUTPUT);
+    pinMode(SDCardMISO, INPUT);
 
 
-  pinMode(SDCardCS, OUTPUT);
-
-}
-void dataLogSDCard() {
-  SPI.begin(SDCardCLK, SDCardMISO, SDCardMOSI, SDCardCS);
-  //Pins are IO#
-
-  int SDCardCS = 18;
-  int SDCardCLK = 35;
-  int SDCardMISO = 12;
-  int SDCardMOSI = 16;
-
-  pinMode(SDCardMOSI, OUTPUT);
+    pinMode(SDCardCLK, OUTPUT);
 
 
-  pinMode(SDCardMISO, INPUT);
+    pinMode(SDCardCS, OUTPUT);
+
+    SD.begin(SDCardCS)
 
 
-  pinMode(SDCardCLK, OUTPUT);
+  }
+void dataLogSDCard(const char *logFile, const char *data) 
+  {
+  File file = SD.open(logFile, FILE_APPEND);
 
+  if (!file) {
+    Serial.println("ERROR: Unable to open log file");
+    return;
+  }
 
-  pinMode(SDCardCS, OUTPUT);
-
-}
+  file.println(data);
+  file.close();
+  }

@@ -2,17 +2,20 @@
 #include "sensorfusion.h"
 
 
-AxisServo servos[] = {
-  {"+Y", Servo(), 12},
-  {"-X", Servo(), 13},
-  {"-Y", Servo(), 27},
-  {"+X", Servo(), 14}
+AxisServo servos[] = 
+{
+  {"+Y", Servo(), 3},
+  {"-X", Servo(), 4},
+  {"-Y", Servo(), 5},
+  {"+X", Servo(), 6}
 };
 
 const int NUM_SERVOS = sizeof(servos) / sizeof(servos[0]);
 
-void ControlServo(String name, float angle) {
-  for (int i = 0; i < NUM_SERVOS; i++) {
+void ControlServo(String name, float angle) 
+{
+  for (int i = 0; i < NUM_SERVOS; i++) 
+  {
     if (servos[i].name == name) {
       float servoAngle = mapGyroToServo(angle, -90, 90);  // Map to servo range
       servos[i].writeAngle(servoAngle);        // Use mapped value
@@ -21,7 +24,8 @@ void ControlServo(String name, float angle) {
   }
 }
 
-float mapGyroToServo(float angle, float minAngle, float maxAngle) {
+float mapGyroToServo(float angle, float minAngle, float maxAngle) 
+{
   // Clamp angle
   if (angle < minAngle) angle = minAngle;
   if (angle > maxAngle) angle = maxAngle;
@@ -29,7 +33,8 @@ float mapGyroToServo(float angle, float minAngle, float maxAngle) {
   return map(angle * 100, minAngle * 100, maxAngle * 100, 0, 180);
 }
 
-void pitchYawControlLoop() {
+void pitchYawControlLoop() 
+{
   // X-axis rotation controlled by servos on Y-axis
   ControlServo("+Y", gyroPositionXAxis);
   ControlServo("-Y", -1 * gyroPositionXAxis);
@@ -38,7 +43,8 @@ void pitchYawControlLoop() {
   ControlServo("+X", -1 * gyroPositionYAxis);
   ControlServo("-X", gyroPositionYAxis);
 }
-void rollControlLoop() {
+void rollControlLoop() 
+{
   // X-axis rotation controlled by servos on Y-axis
   //ControlServo("+Y", gyroPositionZAxis);
   //ControlServo("-Y", -1 * gyroPositionZAxis);

@@ -7,7 +7,8 @@
 
 
 
-void setup() {
+void setup() 
+{
   Serial.begin(115200);
 
   Wire.begin(I2C2_SDA, I2C2_SCL);
@@ -29,8 +30,11 @@ void setup() {
   setupFlash();
 
 }
-unsigned long lastSendTime = 0;
+
+
+unsigned long lastSendTime = 0; 
 const unsigned long sendInterval = 10; 
+
 
 void loop(){
   readRawSensorData(); 

@@ -1,4 +1,5 @@
-void setupSDCard() {
+void setupSDCard() 
+{
   SPI.begin(SDCardCLK, SDCardMISO, SDCardMOSI, SDCardCS);
   //Pins are IO#
 

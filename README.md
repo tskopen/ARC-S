@@ -18,10 +18,9 @@ This project is a Software impletementation of a flight computer for the ARC-S f
   - Euler to quaternarian formulas
 
 ## Requirements
-
-- Python 3.10+
-- [DearPyGui](https://github.com/hoffstadt/DearPyGui)
-- PySerial
+Arduino Library Access
+Ardunio IDE
+Knowledge on boot config
 
 ## Installation
 
