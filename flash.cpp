@@ -5,7 +5,8 @@
 
 SPIClass spiFlash(VSPI); // SPI3
 
-void setupFlash() {
+void setupFlash() 
+{
   pinMode(FLASH_CS, OUTPUT);
   digitalWrite(FLASH_CS, HIGH);
 

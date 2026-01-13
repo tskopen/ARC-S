@@ -28,15 +28,37 @@ void setupSDCard()
 
 
   }
-void dataLogSDCard(const char *logFile, const char *data) 
-  {
-  File file = SD.open(logFile, FILE_APPEND);
+void logAllData() 
+{
+  char buffer[256];
 
-  if (!file) {
-    Serial.println("ERROR: Unable to open log file");
-    return;
-  }
+  unsigned long t = millis();
 
-  file.println(data);
-  file.close();
-  }
+  snprintf(buffer, sizeof(buffer),
+    "%lu,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+    t,
+
+    // Accel (g)
+    gForceAccelerationXAxis,
+    gForceAccelerationYAxis,
+    gForceAccelerationZAxis,
+
+    // Gyro (rad/s)
+    gyroAccelerationXAxis,
+    gyroAccelerationYAxis,
+    gyroAccelerationZAxis,
+
+    // Dead reckoning
+    deadReckoningXAxis,
+    deadReckoningYAxis,
+    deadReckoningZAxis,
+
+    // Magnetometer
+    magneticXAxis,
+    magneticYAxis,
+    magneticZAxis
+  );
+
+  dataLogSDCard("flight.csv", buffer);
+  Serial.println(buffer);   // optional
+}
