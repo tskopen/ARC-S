@@ -28,7 +28,7 @@ void setup()
     servos[i].init_servo();
   }
   loadServoOffsets() 
-  
+
   setupFlash();
 
 }
@@ -39,6 +39,9 @@ const unsigned long sendInterval = 10;
 
 
 void loop(){
+
+  serialCommands();
+  
   readRawSensorData(); 
   pitchYawControlLoop();
   if (gyroAccelerationZAxis > 90)

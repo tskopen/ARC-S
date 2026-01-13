@@ -26,10 +26,17 @@ const int NUM_SERVOS = sizeof(servos) / sizeof(servos[0]);
 
 void ControlServo(String name, float angle) 
 {
+
+
+  if (name == "+Y") offset = servoOffsets.posY;
+  else if (name == "-X") offset = servoOffsets.negX;
+  else if (name == "-Y") offset = servoOffsets.negY;
+  else if (name == "+X") offset = servoOffsets.posX;
+
   for (int i = 0; i < NUM_SERVOS; i++) 
   {
     if (servos[i].name == name) {
-      float servoAngle = mapGyroToServo(angle, -90, 90);  // Map to servo range
+      float servoAngle = mapGyroToServo(angle + offset, -90, 90);  // Map to servo range
       servos[i].writeAngle(servoAngle);        // Use mapped value
       return;
     }
@@ -103,3 +110,33 @@ ServoOffsets loadServoOffsets()
   offsets.posX = EEPROM_readFloat(EEPROM_START_ADDR + 12);
   return offsets;
 }
+void serialCommands() 
+{
+  while (Serial.available() > 0)
+  {      // use while to read all pending
+    String line = Serial.readStringUntil('\n');
+    line.trim();
+
+    // Example: SET OFFSET +Y 12.5
+    if (line.startsWith("SET OFFSET")) 
+    {
+      String servoName = line.substring(11, 13);      // e.g., "+Y"
+      float value = line.substring(14).toFloat();    // new offset
+
+      if (servoName == "+Y") servoOffsets.posY = value;
+      else if (servoName == "-X") servoOffsets.negX = value;
+      else if (servoName == "-Y") servoOffsets.negY = value;
+      else if (servoName == "+X") servoOffsets.posX = value;
+
+      Serial.print("Offset set: "); Serial.println(value);
+    }
+
+    if (line.startsWith("RESET")) 
+    {
+      loadServoOffsets();
+      
+      Serial.print("Servos Reset: "); Serial.println(value);
+    }
+    }
+}
+
