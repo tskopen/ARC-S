@@ -3,14 +3,17 @@
 #include <Adafruit_BusIO_Register.h>
 #include <Adafruit_LIS3MDL.h>
 #include <Arduino_LSM6DSOX.h>
+#include <BMP388_DEV.h>
 #include <cmath>
-
+  BMP388_DEV bmp388;
   Adafruit_LIS3MDL magnetometer;
 
 //Gyro and Accel are dead reckoning so are set to 0... Magno + GPS should give reference if needed... IMU should aim to be start level for now
   float distanceXAxis = 0;
   float distanceYAxis = 0;
   float distanceZAxis = 0;
+
+  float temperature, pressure, altitude;
 
   float accelerationXAxis = 0;
   float accelerationYAxis = 0;
@@ -60,7 +63,6 @@ void readRawSensorData(){
   {
     IMU.readAcceleration(gForceAccelerationXAxis, gForceAccelerationYAxis, gForceAccelerationZAxis);
   }
-
   if (IMU.gyroscopeAvailable()) 
   {
     IMU.readGyroscope(gyroAccelerationXAxis, gyroAccelerationYAxis, gyroAccelerationZAxis);

@@ -9,12 +9,14 @@ struct AxisServo
   Servo servo;           // Servo object
   int pin;               // GPIO pin
 
-  void init_servo() {
+  void init_servo() 
+  {
     servo.setPeriodHertz(50); // 50 Hz for servos
     servo.attach(pin);
   }
 
-  void writeAngle(double angle) {
+  void writeAngle(double angle) 
+  {
     servo.write(angle); // 0–180 degrees
   }
 

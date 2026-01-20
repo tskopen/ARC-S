@@ -1,12 +1,10 @@
 #include <Arduino_LSM6DSOX.h>
 #include <Adafruit_LIS3MDL.h>
 
-#define SerialPort Serial
-#define I2C2_SDA    21
-#define I2C2_SCL    22
 
-#define LSM6DSOX_ADDR 0x6A 
-#define LIS3MDL_ADDR 0x1C 
+
+#define LSM6DSOX_ADDR 0x6B 
+#define LIS3MDL_ADDR 0x1E
 
 extern Adafruit_LIS3MDL magnetometer;
 
