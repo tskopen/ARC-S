@@ -3,9 +3,9 @@
 #include <Adafruit_BusIO_Register.h>
 #include <Adafruit_LIS3MDL.h>
 #include <Arduino_LSM6DSOX.h>
-#include <BMP388_DEV.h>
 #include <cmath>
-  BMP388_DEV bmp388;
+
+
   Adafruit_LIS3MDL magnetometer;
 
 //Gyro and Accel are dead reckoning so are set to 0... Magno + GPS should give reference if needed... IMU should aim to be start level for now
@@ -13,7 +13,6 @@
   float distanceYAxis = 0;
   float distanceZAxis = 0;
 
-  float temperature, pressure, altitude;
 
   float accelerationXAxis = 0;
   float accelerationYAxis = 0;
@@ -58,6 +57,8 @@
   float yawMagnetometer = 0;
 
 
+
+
 void readRawSensorData(){
   if (IMU.accelerationAvailable()) 
   {
@@ -76,16 +77,19 @@ void readRawSensorData(){
   magneticZAxis = magEvent.magnetic.z;
 }
 
-void duringFlightOrientationTracking()
+void duringFlightOrientationTracking(unsigned long dt)
 {
-   gyroPositionXAxis += gForceAccelerationXAxis / 104;
-   gyroPositionYAxis += gForceAccelerationYAxis / 104;
-   gyroPositionZAxis += gForceAccelerationZAxis / 104;
+
+    // Integrate to get angles
+    gyroPositionXAxis += gyroAccelerationXAxis * dt;
+    gyroPositionYAxis += gyroAccelerationYAxis * dt;
+    gyroPositionZAxis += gyroAccelerationZAxis * dt;
 }
 
-void preFlightOrientationTracking()
+
+void preFlightOrientationTracking(unsigned long dt)
 {
-  const float alpha = 0.98;
+  const float alpha = 0.50;
 // purely Gyro,
    gyroPositionXAxis += gForceAccelerationXAxis / 104;
    gyroPositionYAxis += gForceAccelerationYAxis / 104;
@@ -103,18 +107,18 @@ void preFlightOrientationTracking()
 
 }
 
-void duringFlightPositionalTracking()
+void duringFlightPositionalTracking(unsigned long dt)
 {
-  deadReckoningXAxis += (gForceAccelerationXAxis * 9.81 / 104); // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoningYAxis += (gForceAccelerationYAxis * 9.81 / 104);
-  deadReckoningZAxis += (gForceAccelerationZAxis * 9.81 / 104);
+  deadReckoningXAxis += (gForceAccelerationXAxis * 9.81 / dt); // 9.81 g to m/s2 gravity, 104 sensor hz
+  deadReckoningYAxis += (gForceAccelerationYAxis * 9.81 / dt);
+  deadReckoningZAxis += (gForceAccelerationZAxis * 9.81 / dt);
 }
 
-void preFlightPositionalTracking()
+void preFlightPositionalTracking(unsigned long dt)
 {
-  deadReckoningXAxis += gyroIMUCorrectionXAxis / 104; // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoningYAxis += gyroIMUCorrectionYAxis / 104; // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoningZAxis += gyroIMUCorrectionZAxis / 104; // 9.81 g to m/s2 gravity, 104 sensor hz
+  deadReckoningXAxis += gyroIMUCorrectionXAxis / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  deadReckoningYAxis += gyroIMUCorrectionYAxis / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  deadReckoningZAxis += gyroIMUCorrectionZAxis / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
 
   pitch = atan2(gForceAccelerationXAxis, sqrt(gForceAccelerationYAxis * gForceAccelerationYAxis + gForceAccelerationZAxis * gForceAccelerationZAxis));
   roll  = atan2(gForceAccelerationYAxis, sqrt(gForceAccelerationXAxis * gForceAccelerationXAxis + gForceAccelerationZAxis * gForceAccelerationZAxis));

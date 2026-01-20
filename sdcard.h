@@ -14,4 +14,4 @@
 
 void setupSDCard();
 
-void logAllData() 
+void dataLogSDCard(const char *logFile, const char *data);

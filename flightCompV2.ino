@@ -3,44 +3,14 @@
 #include <servos.h>
 #include "flash.h"
 #include "sdcard.h"
-#include <BMP388_DEV.h>
-extern BMP388_DEV bmp388;
+#include <BMP388_DEV.h>                           
+
 #define SerialPort Serial
 #define I2C_SDA    9
 #define I2C_SCL    46
+float temperature, pressure, altitude;            // Create the temperature, pressure and altitude variables
+BMP388_DEV bmp388; 
 
-// I2C Bus Recovery Function - call this if ERROR 259 occurs
-void recoverI2CBus() {
-  Serial.println("I2C Bus Recovery: Resetting I2C driver...");
-  
-  // End current I2C session
-  Wire.end();
-  delay(10);
-  
-  // Manual bus recovery
-  pinMode(I2C_SCL, OUTPUT);
-  pinMode(I2C_SDA, INPUT_PULLUP);
-  
-  // Clock recovery sequence
-  for (int i = 0; i < 10; i++) {
-    digitalWrite(I2C_SCL, LOW);
-    delayMicroseconds(10);
-    digitalWrite(I2C_SCL, HIGH);
-    delayMicroseconds(10);
-  }
-  
-  // Ensure SDA is released
-  pinMode(I2C_SDA, INPUT_PULLUP);
-  delay(10);
-  
-  // Reinitialize I2C
-  Wire.begin(I2C_SDA, I2C_SCL);
-  Wire.setClock(100000);
-  Wire.setTimeout(1000);
-  delay(50);
-  
-  Serial.println("I2C Bus Recovery: Complete");
-}
 
 void setup()
 {
@@ -90,6 +60,10 @@ void setup()
 
   SPI.begin();   // DO NOT start a transaction here
 
+  bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE 
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1.3 seconds
+  bmp388.startNormalConversion();  
+
   // =====================
   // IMU
   // =====================
@@ -101,8 +75,6 @@ void setup()
   {
     Serial.println("IMU OK");
   }
-
-  // =====================
   // Magnetometer (I2C)
   // =====================
   if (!magnetometer.begin_I2C(LIS3MDL_ADDR, &Wire))
@@ -115,27 +87,8 @@ void setup()
   }
   
   
-  if (!bmp388.begin(BMP388_I2C_ALT_ADDR)) 
-  {   // try ALT first
-    Serial.println("BMP388 not found at 0x77, trying 0x76...");
-    if (!bmp388.begin(BMP388_I2C_ADDR)) 
-    {
-      Serial.println("BMP388 FAILED");
-    } 
-    else 
-    {
-      Serial.println("BMP388 OK @ 0x76");
-    }
-  } 
-  else 
-  {
-    Serial.println("BMP388 OK @ 0x77");
-  }
+  
 
-  bmp388.setTimeStandby(TIME_STANDBY_80MS);
-  bmp388.setPresOversampling(OVERSAMPLING_X4);
-  bmp388.setTempOversampling(OVERSAMPLING_X4);
-  bmp388.startNormalConversion();
 
   for (int i = 0; i < NUM_SERVOS; i++)
   {
@@ -148,9 +101,14 @@ unsigned long lastSendTime = 0;
 const unsigned long sendInterval = 100;
 
 
+unsigned long lastTime = 0;
+float dt = 0;
+
 void loop() 
 {
-
+    unsigned long currentTime = micros();          // microseconds
+    dt = (currentTime - lastTime) / 1000000.0;    // convert to seconds
+    lastTime = currentTime;
 
   readRawSensorData();
   pitchYawControlLoop();
@@ -161,26 +119,50 @@ void loop()
 
   if (!launch) {
 
-    preFlightPositionalTracking();
-    preFlightOrientationTracking();
+    preFlightPositionalTracking(dt);
+    preFlightOrientationTracking(dt);
 
-    if (gForceAccelerationZAxis > 1.5) {
+    if (gForceAccelerationZAxis > 1.5) 
+    {
       launch = true;
     }
   }
 
-  if (launch) {
-    duringFlightPositionalTracking();
-    duringFlightOrientationTracking();
+  if (launch) 
+  {
+    duringFlightPositionalTracking(dt);
+    duringFlightOrientationTracking(dt);
   }
 
 
-  unsigned long currentTime = millis();
 
   // Only run every 100 ms
   if (currentTime - lastSendTime >= sendInterval) {
     lastSendTime = currentTime;
-// IMU Accelerometer (g-force)
+
+  if (bmp388.getMeasurements(temperature, pressure, altitude))    // Check if the measurement is complete
+  {
+    Serial.print(temperature);                    // Display the results    
+    Serial.print(F("*C   "));
+    Serial.print(pressure);    
+    Serial.print(F("hPa   "));
+    Serial.print(altitude);
+    Serial.println(F("m"));  
+  }
+
+/*Servos controls
+Serial.print(gyroPositionXAxis, 2);      // Pitch +Y
+Serial.print(",");
+Serial.print(-gyroPositionXAxis, 2);     // Pitch -Y
+Serial.print(",");
+Serial.print(-gyroPositionYAxis, 2);     // Yaw +X
+Serial.print(",");
+Serial.print(gyroPositionYAxis, 2);      // Yaw -X
+Serial.print(",");
+Serial.println(gyroAccelerationZAxis / 90, 2); // Roll +X/-X
+*/
+
+  /*
   Serial.print("ACC_X:"); Serial.print(gForceAccelerationXAxis); Serial.print('\t');
   Serial.print("ACC_Y:"); Serial.print(gForceAccelerationYAxis); Serial.print('\t');
   Serial.print("ACC_Z:"); Serial.println(gForceAccelerationZAxis);
@@ -204,7 +186,7 @@ void loop()
   Serial.print("GP_X:"); Serial.print(gyroPositionXAxis); Serial.print('\t');
   Serial.print("GP_Y:"); Serial.print(gyroPositionYAxis); Serial.print('\t');
   Serial.print("GP_Z:"); Serial.println(gyroPositionZAxis);
-
+*/
   Serial.println(); // Blank line between samples
   }
 }

@@ -57,7 +57,7 @@ extern float yawMagnetometer;
 
 // Function declarations
 void readRawSensorData();
-void duringFlightOrientationTracking();
-void preFlightOrientationTracking();
-void duringFlightPositionalTracking();
-void preFlightPositionalTracking();
+void duringFlightOrientationTracking(unsigned long dt);
+void preFlightOrientationTracking(unsigned long dt);
+void duringFlightPositionalTracking(unsigned long dt);
+void preFlightPositionalTracking(unsigned long dt);
