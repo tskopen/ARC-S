@@ -1,8 +1,16 @@
+/*
+ * Program to control ARC-S Flash Chip
+ *
+ * Name:      Thor Kopenkoskey
+ * Created:   January 15, 2025
+ * Edited:    November 15, 2025
+ */
+
 #include <Arduino.h>
 #include <SPI.h>
 
 #define FLASH_CS   36
-#define FLASH_CLK  35
+#define FLASH_CLK  
 #define FLASH_MISO 37
 #define FLASH_MOSI 39
 

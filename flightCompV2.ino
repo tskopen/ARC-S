@@ -1,3 +1,10 @@
+/*
+ * Program to combine all ARC-S Files into a flight profile for the ARC-S 2026 Fair
+ *
+ * Name:      Thor Kopenkoskey
+ * Created:   November 17, 2025
+ * Edited:    Jan 25, 2025
+ */
 
 #include <sensorfusion.h>
 #include <servos.h>
@@ -21,7 +28,7 @@ void setup()
   delay(2000);
   Serial.println("Serial OK");
 
-
+  EEPROM.begin(EEPROM_SIZE);
 
   // I2C Bus Recovery: Clear any stuck bus state BEFORE initializing Wire
   // Proper I2C bus recovery sequence - must be done before Wire.begin()
@@ -95,10 +102,13 @@ void setup()
     servos[i].init_servo();
   }
 
+  loadOffsetsFromEEPROM(); // restore trims on startup
+  Serial.println("Servo system ready.");
+
 }
 
 unsigned long lastSendTime = 0;
-const unsigned long sendInterval = 100;
+const unsigned long sendInterval = 200000;
 
 
 unsigned long lastTime = 0;
@@ -106,18 +116,23 @@ float dt = 0;
 
 void loop() 
 {
-    unsigned long currentTime = micros();          // microseconds
-    dt = (currentTime - lastTime) / 1000000.0;    // convert to seconds
-    lastTime = currentTime;
+  readSerialAndUpdateServo();
+
+  unsigned long currentTime = micros();          // microseconds
+  dt = (currentTime - lastTime) / 1000000.0;    // convert to seconds
+  lastTime = currentTime;
 
   readRawSensorData();
   pitchYawControlLoop();
-  if (gyroAccelerationZAxis > 90) {
+
+  if (gyroAccelerationZAxis > 90) 
+  {
     rollControlLoop();
   }
 
 
-  if (!launch) {
+  if (!launch) 
+  {
 
     preFlightPositionalTracking(dt);
     preFlightOrientationTracking(dt);
@@ -137,30 +152,31 @@ void loop()
 
 
   // Only run every 100 ms
-  if (currentTime - lastSendTime >= sendInterval) {
-    lastSendTime = currentTime;
-
-  if (bmp388.getMeasurements(temperature, pressure, altitude))    // Check if the measurement is complete
+  if (currentTime - lastSendTime >= sendInterval) 
   {
-    Serial.print(temperature);                    // Display the results    
-    Serial.print(F("*C   "));
-    Serial.print(pressure);    
-    Serial.print(F("hPa   "));
-    Serial.print(altitude);
-    Serial.println(F("m"));  
-  }
+    lastSendTime = currentTime;
+  /*
+    if (bmp388.getMeasurements(temperature, pressure, altitude))    // Check if the measurement is complete
+    {
+      Serial.print(temperature);                    // Display the results    
+      Serial.print(F("*C   "));
+      Serial.print(pressure);    
+      Serial.print(F("hPa   "));
+      Serial.print(altitude);
+      Serial.println(F("m"));  
+    }
+  */
+  //Servos controls
+  Serial.print(gyroPositionXAxis, 2);      // Pitch +Y
+  Serial.print(",");
+  Serial.print(-gyroPositionXAxis, 2);     // Pitch -Y
+  Serial.print(",");
+  Serial.print(-gyroPositionYAxis, 2);     // Yaw +X
+  Serial.print(",");
+  Serial.print(gyroPositionYAxis, 2);      // Yaw -X
+  Serial.print(",");
+  Serial.println(gyroAccelerationZAxis / 90, 2); // Roll +X/-X
 
-/*Servos controls
-Serial.print(gyroPositionXAxis, 2);      // Pitch +Y
-Serial.print(",");
-Serial.print(-gyroPositionXAxis, 2);     // Pitch -Y
-Serial.print(",");
-Serial.print(-gyroPositionYAxis, 2);     // Yaw +X
-Serial.print(",");
-Serial.print(gyroPositionYAxis, 2);      // Yaw -X
-Serial.print(",");
-Serial.println(gyroAccelerationZAxis / 90, 2); // Roll +X/-X
-*/
 
   /*
   Serial.print("ACC_X:"); Serial.print(gForceAccelerationXAxis); Serial.print('\t');

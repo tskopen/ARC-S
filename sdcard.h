@@ -1,13 +1,10 @@
 /*
- ESP32 startup counter example with Preferences library.
-
- This simple example demonstrates using the Preferences library to store how many times the ESP32 module has booted. 
- The Preferences library is a wrapper around the Non-volatile storage on ESP32 processor.
-
- created for arduino-esp32 09 Feb 2017 by Martin Sloup (Arcao)
- 
- Complete project details at https://RandomNerdTutorials.com/esp32-save-data-permanently-preferences/
-*/
+ * Header file for ARC-S SD Card logging Controller
+ *
+ * Name:      Thor Kopenkoskey
+ * Created:   January 11, 2025
+ * Edited:    January 15, 2025
+ */
 
 #include <Preferences.h>
 

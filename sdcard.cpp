@@ -1,3 +1,11 @@
+/*
+ * Program to control ARC-S SD Card logging
+ *
+ * Name:      Thor Kopenkoskey
+ * Created:   January 11, 2025
+ * Edited:    January 15, 2025
+ */
+
 #include "sdcard.h"
 #include <Arduino.h>  // must include this for pinMode, digitalWrite, HIGH, OUTPUT
 #include <SPI.h>

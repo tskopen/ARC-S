@@ -1,3 +1,11 @@
+/*
+ * Program to combine all ARC-S Sensors into positional tracking/calculations.
+ *
+ * Name:      Thor Kopenkoskey
+ * Created:   July 1, 2025
+ * Edited:    Jan 25, 2025
+ */
+
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BusIO_Register.h>
