@@ -10,12 +10,12 @@
 #include <servos.h>
 #include "flash.h"
 #include "sdcard.h"
-#include <BMP388_DEV.h>                           
 
 #define SerialPort Serial
 #define I2C_SDA    9
 #define I2C_SCL    46
 
+extern craftState vehicle;
 
 void setup()
 {
@@ -53,18 +53,16 @@ void setup()
 }
 
 
-
-
-
-
 void loop() 
 {
-  vehicle.getDeltaTime();
+  double dt = getDeltaTime();
+  unsigned long currentTime = micros();
+
 
   readSerialAndUpdateServo();
 
-  vehicle.readRawSensorData();
-
+  vehicle.readGAM();
+  vehicle.readBarometerData();
   pitchYawControlLoop();
 
   if (vehicle.gyro_dps.z > 90) 
@@ -73,9 +71,8 @@ void loop()
   }
 
 
-  if (!launch) 
+  if (vehicle.launch == false)
   {
-
     vehicle.preFlightPositionalTracking(dt);
     vehicle.preFlightOrientationTracking(dt);
 
@@ -86,14 +83,13 @@ void loop()
 
   }
 
-  if (launch) 
+  if (vehicle.launch == true)
   {
 
     vehicle.duringFlightPositionalTracking(dt);
     vehicle.duringFlightOrientationTracking(dt);
 
   }
-
 
   unsigned long lastSendTime = 0;
   const unsigned long sendInterval = 1000;

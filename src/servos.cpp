@@ -8,7 +8,6 @@
 
 #include "servos.h"
 #include "sensorfusion.h"
-#include <EEPROM.h>
 
 extern craftState vehicle;
 

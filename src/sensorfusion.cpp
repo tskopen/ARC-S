@@ -12,6 +12,8 @@
 #include <Adafruit_LIS3MDL.h>
 #include <Arduino_LSM6DSOX.h>
 #include <cmath>
+#include <BMP388_DEV.h>
+#include <sensorfusion.h>
 
 
   Adafruit_LIS3MDL magnetometer;
@@ -19,7 +21,7 @@
 
   craftState vehicle;
 
-void initalizeSensors()
+void craftState::initalizeSensors()
 {
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE
   bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1.3 seconds
@@ -61,16 +63,41 @@ double getDeltaTime()
   return dt;
 }
 
+void craftState::readBarometerData()
+{
+  float t, p, a;
+
+  if (bmp388.getMeasurements(t, p, a))
+  {
+    vehicle.temperature_C = t;
+    vehicle.pressure_Pa   = p;
+    vehicle.altitude_m    = a;
+  }
+
+}
+
 //GAM = Gyro, Accel, Magno
-void readGAM(){
+void craftState::readGAM()
+{
+  float ax, ay, az;
+  float gx, gy, gz;
+
   if (IMU.accelerationAvailable()) 
   {
-    IMU.readAcceleration(vehicle.accel_g.x, vehicle.accel_g.y, vehicle.accel_g.z);
+    IMU.readAcceleration(ax, ay, az);
   }
   if (IMU.gyroscopeAvailable()) 
   {
-    IMU.readGyroscope(vehicle.gyro_dps.x, vehicle.gyro_dps.y, vehicle.gyro_dps.z);
+    IMU.readGyroscope(gx, gy, gz);
   }
+
+  vehicle.accel_g.x = ax;
+  vehicle.accel_g.y = ay;
+  vehicle.accel_g.z = az;
+
+  vehicle.gyro_dps.x = gx;
+  vehicle.gyro_dps.y = gy;
+  vehicle.gyro_dps.z = gz;
 
   sensors_event_t magEvent;
   magnetometer.getEvent(&magEvent);
@@ -80,7 +107,7 @@ void readGAM(){
   vehicle.mag_uT.z = magEvent.magnetic.z;
 }
 
-void duringFlightOrientationTracking(double dt)
+void craftState::duringFlightOrientationTracking(double dt)
 {
     // Integrate to get angles, LSOX Sensor gives rotation velocity
     vehicle.gyroAngle_deg.x += vehicle.gyro_dps.x * dt;
@@ -91,37 +118,37 @@ void duringFlightOrientationTracking(double dt)
 
 
 
-void duringFlightPositionalTracking(double dt)
+void craftState::duringFlightPositionalTracking(double dt)
 {
   vehicle.deadReckoning_mps2.x += (vehicle.accel_g.x * GRAVITY * dt);
   vehicle.deadReckoning_mps2.y += (vehicle.accel_g.y * GRAVITY * dt);
   vehicle.deadReckoning_mps2.z += (vehicle.accel_g.z * GRAVITY * dt);
 }
 
-void preFlightOrientationTracking(double dt)
+void craftState::preFlightOrientationTracking(double dt)
 {
   const float alpha = 0.50;
   //Corect pitch/roll with IMU while static
-  vehicle.gyroAngle_deg.x = alpha * vehicle.gyroAngle_deg.x + (1 - alpha) * (pitch * 180.0 / PI);
-  vehicle.gyroAngle_deg.y = alpha * vehicle.gyroAngle_deg.y + (1 - alpha) * (roll * 180.0 / PI);
+  vehicle.gyroAngle_deg.x = alpha * vehicle.gyroAngle_deg.x + (1 - alpha) * (vehicle.pitch * 180.0 / PI);
+  vehicle.gyroAngle_deg.y = alpha * vehicle.gyroAngle_deg.y + (1 - alpha) * (vehicle.roll * 180.0 / PI);
 
   //Correct yaw with fusiong Magnometer
   vehicle.yaw = atan2(vehicle.mag_uT.y, vehicle.mag_uT.x) * (180.0 / PI); // degrees
   if (vehicle.yaw < 0) vehicle.yaw += 360.0; // Normalize to 0-360
 
-  vehicle.gyroAngle_deg.z = alpha * vehicle.gyroAngle_deg.z + (1 - alpha) * yawMagnetometer;;
+  vehicle.gyroAngle_deg.z = alpha * vehicle.gyroAngle_deg.z + (1 - alpha) * vehicle.yaw;;
 
 }
 
-void preFlightPositionalTracking(double dt)
+void craftState::preFlightPositionalTracking(double dt)
 {
   vehicle.deadReckoning_mps2.x += vehicle.gyroAngle_deg.x / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
   vehicle.deadReckoning_mps2.y += vehicle.gyroAngle_deg.y / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
   vehicle.deadReckoning_mps2.z += vehicle.gyroAngle_deg.z / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
 
-  computeGravity();
+  vehicle.computeGravity();
 
-  vehicle.deadReckoning_mps2.x = (accel_g.x * 9.81) - gravityX;
-  vehicle.deadReckoning_mps2.y = (accel_g.y * 9.81) - gravityY;
-  vehicle.deadReckoning_mps2.z = (accel_g.z * 9.81) - gravityZ;
+  vehicle.deadReckoning_mps2.x = (vehicle.accel_g.x * 9.81) - vehicle.gravity_mps2.x;
+  vehicle.deadReckoning_mps2.y = (vehicle.accel_g.y * 9.81) - vehicle.gravity_mps2.y;
+  vehicle.deadReckoning_mps2.z = (vehicle.accel_g.z * 9.81) - vehicle.gravity_mps2.z;
 }

@@ -23,7 +23,8 @@ struct Vec3 {
     void zero();
 };
 
-class craftState {
+class craftState
+{
     public:
     // Raw sensors
     Vec3 accel_g;
@@ -40,9 +41,9 @@ class craftState {
     double roll = 0.0;
     double yaw = 0.0;
 
-    float temperature;
-    float pressure;
-    float altitude;
+    float temperature_C;
+    float pressure_Pa;
+    float altitude_m;
 
     bool launch = false;
     bool apogee = false; //apogee can be cruising altitude for aircraft
@@ -54,7 +55,7 @@ class craftState {
     void duringFlightPositionalTracking(double dt);
     void preFlightOrientationTracking(double dt);
     void preFlightPositionalTracking(double dt);
-
+    void readBarometerData();
 
     void computeGravity()
     {
@@ -69,3 +70,4 @@ class craftState {
     }
 
 };
+double getDeltaTime();
