@@ -3,7 +3,7 @@
  *
  * Name:      Thor Kopenkoskey
  * Created:   July 1, 2025
- * Edited:    Jan 25, 2025
+ * Edited:    Jan 27, 2025
  */
 
 #include <Wire.h>
@@ -15,127 +15,116 @@
 
 
   Adafruit_LIS3MDL magnetometer;
+  BMP388_DEV bmp388;
+using namespace craftState;
+void initalizeSensors()
+{
+  bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE
+  bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1.3 seconds
+  bmp388.startNormalConversion();
 
-//Gyro and Accel are dead reckoning so are set to 0... Magno + GPS should give reference if needed... IMU should aim to be start level for now
-  float distanceXAxis = 0;
-  float distanceYAxis = 0;
-  float distanceZAxis = 0;
+  // =====================
+  // IMU
+  // =====================
+  if (!IMU.begin())
+  {
+    Serial.println("IMU failed!");
+  }
+  else
+  {
+    Serial.println("IMU OK");
+  }
+  // Magnetometer (I2C)
+  // =====================
 
+  if (!magnetometer.begin_I2C(LIS3MDL_ADDR, &Wire))
+  {
+    Serial.println("Magnetometer failed!");
+  }
+  else
+  {
+    Serial.println("Mag OK");
+  }
+}
 
-  float accelerationXAxis = 0;
-  float accelerationYAxis = 0;
-  float accelerationZAxis = 0;
+double getDeltaTime()
+{
+  static unsigned long lastTime = 0;         // remembers last call
+  unsigned long currentTime = micros();      // current time in microseconds
 
-  float gyroPositionXAxis = 0;
-  float gyroPositionYAxis = 0;
-  float gyroPositionZAxis = 0;
+  double dt = (currentTime - lastTime) / 1e6; // convert to seconds, sensors report MS and DPS
 
-  float gyroAccelerationXAxis = 0;
-  float gyroAccelerationYAxis = 0;
-  float gyroAccelerationZAxis = 0;
+  lastTime = currentTime;
 
-  float magneticXAxis = 0;
-  float magneticYAxis = 0;
-  float magneticZAxis = 0;
+  return dt;
+}
 
-  float gForceAccelerationXAxis = 0;
-  float gForceAccelerationYAxis = 0;
-  float gForceAccelerationZAxis = 0;
-
-  float MPSAccelerationXAxis = 0;
-  float MPSAccelerationYAxis = 0;
-  float MPSAccelerationZAxis = 0;
-
-  float deadReckoningXAxis = 0;
-  float deadReckoningYAxis = 0;
-  float deadReckoningZAxis = 0;
-
-  float pitch = 0;
-  float roll = 0;
-
-  float gyroIMUCorrectionXAxis = 0;
-  float gyroIMUCorrectionYAxis = 0;
-  float gyroIMUCorrectionZAxis = 0;
-
-  float gravityX = 0;
-  float gravityY = 0;
-  float gravityZ = 0;
-
-  bool launch = false;
-  float yawMagnetometer = 0;
-
-
-
-
-void readRawSensorData(){
+//GAM = Gyro, Accel, Magno
+void readGAM(){
   if (IMU.accelerationAvailable()) 
   {
-    IMU.readAcceleration(gForceAccelerationXAxis, gForceAccelerationYAxis, gForceAccelerationZAxis);
+    IMU.readAcceleration(accel_g.x, accel_g.y, accel_g.z);
   }
   if (IMU.gyroscopeAvailable()) 
   {
-    IMU.readGyroscope(gyroAccelerationXAxis, gyroAccelerationYAxis, gyroAccelerationZAxis);
+    IMU.readGyroscope(gyro_dps.x, gyro_dps.y, gyro_dps.z);
   }
 
   sensors_event_t magEvent;
   magnetometer.getEvent(&magEvent);
 
-  magneticXAxis = magEvent.magnetic.x;
-  magneticYAxis = magEvent.magnetic.y;
-  magneticZAxis = magEvent.magnetic.z;
+  mag_uT.x = magEvent.magnetic.x;
+  mag_uT.y = magEvent.magnetic.y;
+  mag_uT.z = magEvent.magnetic.z;
 }
 
-void duringFlightOrientationTracking(unsigned long dt)
+void duringFlightOrientationTracking(double dt)
 {
-
-    // Integrate to get angles
-    gyroPositionXAxis += gyroAccelerationXAxis * dt;
-    gyroPositionYAxis += gyroAccelerationYAxis * dt;
-    gyroPositionZAxis += gyroAccelerationZAxis * dt;
+    // Integrate to get angles, LSOX Sensor gives rotation velocity
+    gyroAngle_deg.x += gyro_dps.x * dt;
+    gyroAngle_deg.y += gyro_dps.y * dt;
+    gyroAngle_deg.z += gyro_dps.z * dt;
 }
 
 
-void preFlightOrientationTracking(unsigned long dt)
+
+
+void duringFlightPositionalTracking(double dt)
+{
+  deadReckoning_mps2.x += (accel_g.x * GRAVITY * dt);
+  deadReckoning_mps2.y += (accel_g.y * GRAVITY * dt);
+  deadReckoning_mps2.z += (accel_g.z * GRAVITY * dt);
+}
+
+void preFlightOrientationTracking(double dt)
 {
   const float alpha = 0.50;
-// purely Gyro,
-   gyroPositionXAxis += gForceAccelerationXAxis / 104;
-   gyroPositionYAxis += gForceAccelerationYAxis / 104;
-   gyroPositionZAxis += gForceAccelerationZAxis / 104;
+  //Corect pitch/roll with IMU while static
+  gyroAngle_deg.x = alpha * gyroPositionXAxis + (1 - alpha) * (pitch * 180.0 / PI);
+  gyroAngle_deg.y = alpha * gyroPositionYAxis + (1 - alpha) * (roll * 180.0 / PI);
 
-//Corect pitch/roll with IMU while static
-   gyroPositionXAxis = alpha * gyroPositionXAxis + (1 - alpha) * (pitch * 180.0 / PI);
-   gyroPositionYAxis = alpha * gyroPositionYAxis + (1 - alpha) * (roll * 180.0 / PI);
-
-//Correct yaw with fusiong Magnometer
+  //Correct yaw with fusiong Magnometer
   yawMagnetometer = atan2(magneticYAxis, magneticXAxis) * (180.0 / PI); // degrees
   if (yawMagnetometer < 0) yawMagnetometer += 360.0; // Normalize to 0-360
 
-   gyroPositionZAxis = alpha * gyroPositionZAxis + (1 - alpha) * yawMagnetometer;;
+  gyroAngle_deg.z = alpha * gyroPositionZAxis + (1 - alpha) * yawMagnetometer;;
 
 }
 
-void duringFlightPositionalTracking(unsigned long dt)
+void preFlightPositionalTracking(double dt)
 {
-  deadReckoningXAxis += (gForceAccelerationXAxis * 9.81 / dt); // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoningYAxis += (gForceAccelerationYAxis * 9.81 / dt);
-  deadReckoningZAxis += (gForceAccelerationZAxis * 9.81 / dt);
-}
+  deadReckoning_mps2.x += gyroAngle_deg.x / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  deadReckoning_mps2.y += gyroAngle_deg.y / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  deadReckoning_mps2.z += gyroAngle_deg.z / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
 
-void preFlightPositionalTracking(unsigned long dt)
-{
-  deadReckoningXAxis += gyroIMUCorrectionXAxis / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoningYAxis += gyroIMUCorrectionYAxis / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoningZAxis += gyroIMUCorrectionZAxis / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
-
-  pitch = atan2(gForceAccelerationXAxis, sqrt(gForceAccelerationYAxis * gForceAccelerationYAxis + gForceAccelerationZAxis * gForceAccelerationZAxis));
-  roll  = atan2(gForceAccelerationYAxis, sqrt(gForceAccelerationXAxis * gForceAccelerationXAxis + gForceAccelerationZAxis * gForceAccelerationZAxis));
+  pitch = atan2(accel_g.x, sqrt(accel_g.y * accel_g.y + accel_g.z * accel_g.z));
+  roll  = atan2(accel_g.y, sqrt(accel_g.x * accel_g.x + accel_g.z * accel_g.z));
 
   gravityX = 9.81 * sin(pitch);
   gravityY = 9.81 * sin(roll);
   gravityZ = sqrt(9.81*9.81 - gravityX*gravityX - gravityY*gravityY); // assumes level
 
-  deadReckoningXAxis = (gForceAccelerationXAxis * 9.81) - gravityX;
-  deadReckoningYAxis = (gForceAccelerationYAxis * 9.81) - gravityY;
-  deadReckoningZAxis = (gForceAccelerationZAxis * 9.81) - gravityZ;
+  deadReckoning_mps2.x = (accel_g.x * 9.81) - gravityX;
+  deadReckoning_mps2.y = (accel_g.y * 9.81) - gravityY;
+  deadReckoning_mps2.z = (accel_g.z * 9.81) - gravityZ;
 }

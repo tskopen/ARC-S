@@ -3,7 +3,7 @@
  *
  * Name:      Thor Kopenkoskey
  * Created:   November 17, 2025
- * Edited:    Jan 25, 2025
+ * Edited:    Jan 28, 2025
  */
 
 #include <Arduino_LSM6DSOX.h>
@@ -13,59 +13,45 @@
 
 #define LSM6DSOX_ADDR 0x6B 
 #define LIS3MDL_ADDR 0x1E
+const double GRAVITY = 9.80665;
+struct Vec3 {
 
-extern Adafruit_LIS3MDL magnetometer;
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
 
-// Declare all global variables as extern here
-extern float distanceXAxis;
-extern float distanceYAxis;
-extern float distanceZAxis;
+    void zero();
+};
 
-extern float accelerationXAxis;
-extern float accelerationYAxis;
-extern float accelerationZAxis;
+class craftState {
+    public:
+    // Raw sensors
+    Vec3 accel_g;
+    Vec3 gyro_dps;
+    Vec3 mag_uT;
 
-extern float gyroPositionXAxis;
-extern float gyroPositionYAxis;
-extern float gyroPositionZAxis;
+    // Derived state
+    Vec3 deadReckoning_mps2;
+    Vec3 gyroAngle_deg;
+    Vec3 gravity_mps2;
 
-extern float gyroAccelerationXAxis;
-extern float gyroAccelerationYAxis;
-extern float gyroAccelerationZAxis;
+    double pitch = 0.0;
+    double roll = 0.0;
+    double yaw = 0.0;
 
-extern float magneticXAxis;
-extern float magneticYAxis;
-extern float magneticZAxis;
+    float temperature;
+    float pressure;
+    float altitude;
 
-extern float gForceAccelerationXAxis;
-extern float gForceAccelerationYAxis;
-extern float gForceAccelerationZAxis;
+    bool launch = false;
+    bool apogee = false; //apogee can be cruising altitude for aircraft
+    bool landed = false;
 
-extern float MPSAccelerationXAxis;
-extern float MPSAccelerationYAxis;
-extern float MPSAccelerationZAxis;
+    void initalizeSensors();
+    void readGAM();
+    void duringFlightOrientationTracking(double dt);
+    void preFlightOrientationTracking(double dt);
+    void duringFlightPositionalTracking(double dt);
+    void preFlightPositionalTracking(double dt);
 
-extern float deadReckoningXAxis;
-extern float deadReckoningYAxis;
-extern float deadReckoningZAxis;
-
-extern float pitch;
-extern float roll;
-
-extern float gyroIMUCorrectionXAxis;
-extern float gyroIMUCorrectionYAxis;
-extern float gyroIMUCorrectionZAxis;
-
-extern float gravityX;
-extern float gravityY;
-extern float gravityZ;
-
-extern bool launch;
-extern float yawMagnetometer;
-
-// Function declarations
-void readRawSensorData();
-void duringFlightOrientationTracking(unsigned long dt);
-void preFlightOrientationTracking(unsigned long dt);
-void duringFlightPositionalTracking(unsigned long dt);
-void preFlightPositionalTracking(unsigned long dt);
+};
