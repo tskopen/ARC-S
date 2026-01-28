@@ -10,7 +10,7 @@
 #include "sensorfusion.h"
 #include <EEPROM.h>
 
-
+extern craftState vehicle;
 
 int initialOffset = 1500;
 String inputString = "";
@@ -140,12 +140,12 @@ float mapGyroToServo(float angle, float minAngle, float maxAngle)
 void pitchYawControlLoop() 
 {
   // X-axis rotation controlled by servos on Y-axis
-  ControlServo("+Y", gyroAngle_deg.x);
-  ControlServo("-Y", -1 * gyroAngle_deg.x);
+  ControlServo("+Y", vehicle.gyroAngle_deg.x);
+  ControlServo("-Y", -1 * vehicle.gyroAngle_deg.x);
 
   // Y-axis rotation controlled by servos on X-axis
-  ControlServo("+X", -1 * gyroAngle_deg.y);
-  ControlServo("-X", gyroAngle_deg.x);
+  ControlServo("+X", -1 * vehicle.gyroAngle_deg.y);
+  ControlServo("-X", vehicle.gyroAngle_deg.x);
 
 
 
@@ -155,7 +155,7 @@ void rollControlLoop()
   // X-axis rotation controlled by servos on Y-axis
   //ControlServo("+Y", gyroPositionZAxis);
   //ControlServo("-Y", -1 * gyroPositionZAxis);
-  ControlServo("+X", gyroAngle_deg.z / 90); //90 DPS authority limitor
-  ControlServo("-X", gyroAngle_deg.z / 90);
+  ControlServo("+X", vehicle.gyroAngle_deg.z / 90); //90 DPS authority limitor
+  ControlServo("-X", vehicle.gyroAngle_deg.z / 90);
 
 }

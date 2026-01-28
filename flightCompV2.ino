@@ -40,7 +40,7 @@ void setup()
 
   SPI.begin();
 
-  IMUState::initalizeSensors();
+  vehicle.initalizeSensors();
 
   for (int i = 0; i < NUM_SERVOS; i++)
   {
@@ -59,15 +59,15 @@ void setup()
 
 void loop() 
 {
-  getDeltaTime();
+  vehicle.getDeltaTime();
 
   readSerialAndUpdateServo();
 
-  readRawSensorData();
+  vehicle.readRawSensorData();
 
   pitchYawControlLoop();
 
-  if (gyroAccelerationZAxis > 90) 
+  if (vehicle.gyro_dps.z > 90) 
   {
     rollControlLoop();
   }
@@ -76,12 +76,12 @@ void loop()
   if (!launch) 
   {
 
-    preFlightPositionalTracking(dt);
-    preFlightOrientationTracking(dt);
+    vehicle.preFlightPositionalTracking(dt);
+    vehicle.preFlightOrientationTracking(dt);
 
-    if (gForceAccelerationZAxis > 1.5) 
+    if (vehicle.gyro_dps.z > 1.5) 
     {
-      Telemetry.launch = true;
+      vehicle.launch = true;
     }
 
   }
@@ -89,8 +89,8 @@ void loop()
   if (launch) 
   {
 
-    duringFlightPositionalTracking(dt);
-    duringFlightOrientationTracking(dt);
+    vehicle.duringFlightPositionalTracking(dt);
+    vehicle.duringFlightOrientationTracking(dt);
 
   }
 

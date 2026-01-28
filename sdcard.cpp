@@ -20,8 +20,8 @@
 void setupSDCard() 
 {
     // Initialize SPI bus for SD card
-    SPI.begin(SDCardCLK, SDCardMISO, SDCardMOSI, SDCardCS);
-
+    SPI.begin(FLASH_CLK, FLASH_MISO, FLASH_MOSI, FLASH_CS);
+    spiFlash.begin();
     // Set pin modes
     pinMode(SDCardMOSI, OUTPUT);
     pinMode(SDCardMISO, INPUT);

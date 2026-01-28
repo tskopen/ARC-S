@@ -16,7 +16,9 @@
 
   Adafruit_LIS3MDL magnetometer;
   BMP388_DEV bmp388;
-using namespace craftState;
+
+  craftState vehicle;
+
 void initalizeSensors()
 {
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE
@@ -63,27 +65,27 @@ double getDeltaTime()
 void readGAM(){
   if (IMU.accelerationAvailable()) 
   {
-    IMU.readAcceleration(accel_g.x, accel_g.y, accel_g.z);
+    IMU.readAcceleration(vehicle.accel_g.x, vehicle.accel_g.y, vehicle.accel_g.z);
   }
   if (IMU.gyroscopeAvailable()) 
   {
-    IMU.readGyroscope(gyro_dps.x, gyro_dps.y, gyro_dps.z);
+    IMU.readGyroscope(vehicle.gyro_dps.x, vehicle.gyro_dps.y, vehicle.gyro_dps.z);
   }
 
   sensors_event_t magEvent;
   magnetometer.getEvent(&magEvent);
 
-  mag_uT.x = magEvent.magnetic.x;
-  mag_uT.y = magEvent.magnetic.y;
-  mag_uT.z = magEvent.magnetic.z;
+  vehicle.mag_uT.x = magEvent.magnetic.x;
+  vehicle.mag_uT.y = magEvent.magnetic.y;
+  vehicle.mag_uT.z = magEvent.magnetic.z;
 }
 
 void duringFlightOrientationTracking(double dt)
 {
     // Integrate to get angles, LSOX Sensor gives rotation velocity
-    gyroAngle_deg.x += gyro_dps.x * dt;
-    gyroAngle_deg.y += gyro_dps.y * dt;
-    gyroAngle_deg.z += gyro_dps.z * dt;
+    vehicle.gyroAngle_deg.x += vehicle.gyro_dps.x * dt;
+    vehicle.gyroAngle_deg.y += vehicle.gyro_dps.y * dt;
+    vehicle.gyroAngle_deg.z += vehicle.gyro_dps.z * dt;
 }
 
 
@@ -91,40 +93,35 @@ void duringFlightOrientationTracking(double dt)
 
 void duringFlightPositionalTracking(double dt)
 {
-  deadReckoning_mps2.x += (accel_g.x * GRAVITY * dt);
-  deadReckoning_mps2.y += (accel_g.y * GRAVITY * dt);
-  deadReckoning_mps2.z += (accel_g.z * GRAVITY * dt);
+  vehicle.deadReckoning_mps2.x += (vehicle.accel_g.x * GRAVITY * dt);
+  vehicle.deadReckoning_mps2.y += (vehicle.accel_g.y * GRAVITY * dt);
+  vehicle.deadReckoning_mps2.z += (vehicle.accel_g.z * GRAVITY * dt);
 }
 
 void preFlightOrientationTracking(double dt)
 {
   const float alpha = 0.50;
   //Corect pitch/roll with IMU while static
-  gyroAngle_deg.x = alpha * gyroPositionXAxis + (1 - alpha) * (pitch * 180.0 / PI);
-  gyroAngle_deg.y = alpha * gyroPositionYAxis + (1 - alpha) * (roll * 180.0 / PI);
+  vehicle.gyroAngle_deg.x = alpha * vehicle.gyroAngle_deg.x + (1 - alpha) * (pitch * 180.0 / PI);
+  vehicle.gyroAngle_deg.y = alpha * vehicle.gyroAngle_deg.y + (1 - alpha) * (roll * 180.0 / PI);
 
   //Correct yaw with fusiong Magnometer
-  yawMagnetometer = atan2(magneticYAxis, magneticXAxis) * (180.0 / PI); // degrees
-  if (yawMagnetometer < 0) yawMagnetometer += 360.0; // Normalize to 0-360
+  vehicle.yaw = atan2(vehicle.mag_uT.y, vehicle.mag_uT.x) * (180.0 / PI); // degrees
+  if (vehicle.yaw < 0) vehicle.yaw += 360.0; // Normalize to 0-360
 
-  gyroAngle_deg.z = alpha * gyroPositionZAxis + (1 - alpha) * yawMagnetometer;;
+  vehicle.gyroAngle_deg.z = alpha * vehicle.gyroAngle_deg.z + (1 - alpha) * yawMagnetometer;;
 
 }
 
 void preFlightPositionalTracking(double dt)
 {
-  deadReckoning_mps2.x += gyroAngle_deg.x / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoning_mps2.y += gyroAngle_deg.y / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
-  deadReckoning_mps2.z += gyroAngle_deg.z / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  vehicle.deadReckoning_mps2.x += vehicle.gyroAngle_deg.x / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  vehicle.deadReckoning_mps2.y += vehicle.gyroAngle_deg.y / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  vehicle.deadReckoning_mps2.z += vehicle.gyroAngle_deg.z / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
 
-  pitch = atan2(accel_g.x, sqrt(accel_g.y * accel_g.y + accel_g.z * accel_g.z));
-  roll  = atan2(accel_g.y, sqrt(accel_g.x * accel_g.x + accel_g.z * accel_g.z));
+  computeGravity();
 
-  gravityX = 9.81 * sin(pitch);
-  gravityY = 9.81 * sin(roll);
-  gravityZ = sqrt(9.81*9.81 - gravityX*gravityX - gravityY*gravityY); // assumes level
-
-  deadReckoning_mps2.x = (accel_g.x * 9.81) - gravityX;
-  deadReckoning_mps2.y = (accel_g.y * 9.81) - gravityY;
-  deadReckoning_mps2.z = (accel_g.z * 9.81) - gravityZ;
+  vehicle.deadReckoning_mps2.x = (accel_g.x * 9.81) - gravityX;
+  vehicle.deadReckoning_mps2.y = (accel_g.y * 9.81) - gravityY;
+  vehicle.deadReckoning_mps2.z = (accel_g.z * 9.81) - gravityZ;
 }

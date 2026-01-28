@@ -35,6 +35,7 @@ class craftState {
     Vec3 gyroAngle_deg;
     Vec3 gravity_mps2;
 
+
     double pitch = 0.0;
     double roll = 0.0;
     double yaw = 0.0;
@@ -50,8 +51,21 @@ class craftState {
     void initalizeSensors();
     void readGAM();
     void duringFlightOrientationTracking(double dt);
-    void preFlightOrientationTracking(double dt);
     void duringFlightPositionalTracking(double dt);
+    void preFlightOrientationTracking(double dt);
     void preFlightPositionalTracking(double dt);
+
+
+    void computeGravity()
+    {
+        // Compute pitch and roll from accelerometer
+        pitch = atan2(accel_g.x, sqrt(accel_g.y*accel_g.y + accel_g.z*accel_g.z));
+        roll  = atan2(accel_g.y, sqrt(accel_g.x*accel_g.x + accel_g.z*accel_g.z));
+
+        // Gravity vector in sensor frame (m/s²)
+        gravity_mps2.x = 9.81 * sin(pitch);
+        gravity_mps2.y = 9.81 * sin(roll);
+        gravity_mps2.z = sqrt(9.81*9.81 - gravity_mps2.x*gravity_mps2.x - gravity_mps2.y*gravity_mps2.y);
+    }
 
 };
