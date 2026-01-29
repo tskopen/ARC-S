@@ -7,6 +7,10 @@
  */
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+#include "telemetry.h"
+>>>>>>> Stashed changes
 =======
 #include "telemetry.h"
 >>>>>>> Stashed changes
@@ -14,6 +18,7 @@
 #include <servos.h>
 #include "flash.h"
 #include "sdcard.h"
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
 #define SerialPort Serial
@@ -25,6 +30,8 @@ extern craftState vehicle;
 void setup()
 {
 =======
+=======
+>>>>>>> Stashed changes
 Telemetry telemetry;
 
 #define SerialPort Serial
@@ -34,6 +41,9 @@ Telemetry telemetry;
 extern craftState vehicle;
 
 void setup() {
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   delay(300);
   Serial.begin(115200);
@@ -44,7 +54,11 @@ void setup() {
 
   Wire.begin(I2C_SDA, I2C_SCL);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   Wire.setClock(100000);  
+=======
+  Wire.setClock(100000);
+>>>>>>> Stashed changes
 =======
   Wire.setClock(100000);
 >>>>>>> Stashed changes
@@ -53,8 +67,12 @@ void setup() {
   Wire.beginTransmission(0x00);  // General call address (should always NACK, but tests bus)
   uint8_t error = Wire.endTransmission();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   if (error != 0 && error != 2) 
   {  // 2 = NACK (expected), other errors indicate problems
+=======
+  if (error != 0 && error != 2) {  // 2 = NACK (expected), other errors indicate problems
+>>>>>>> Stashed changes
 =======
   if (error != 0 && error != 2) {  // 2 = NACK (expected), other errors indicate problems
 >>>>>>> Stashed changes
@@ -66,6 +84,7 @@ void setup() {
 
   vehicle.initalizeSensors();
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   for (int i = 0; i < NUM_SERVOS; i++)
   {
@@ -81,6 +100,8 @@ void setup() {
 void loop() 
 {
 =======
+=======
+>>>>>>> Stashed changes
   for (int i = 0; i < NUM_SERVOS; i++) {
     servos[i].init_servo();
   }
@@ -91,6 +112,9 @@ void loop()
 
 
 void loop() {
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   double dt = getDeltaTime();
   unsigned long currentTime = micros();
@@ -109,7 +133,11 @@ void loop() {
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   if (vehicle.launch == false)
+=======
+  if (vehicle.launch == false) 
+>>>>>>> Stashed changes
 =======
   if (vehicle.launch == false) 
 >>>>>>> Stashed changes
@@ -122,6 +150,7 @@ void loop() {
       vehicle.launch = true;
     }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
   }
 
@@ -131,10 +160,16 @@ void loop() {
 
   if (vehicle.launch == true) 
 >>>>>>> Stashed changes
+=======
+  }
+
+  if (vehicle.launch == true) 
+>>>>>>> Stashed changes
   {
 
     vehicle.duringFlightPositionalTracking(dt);
     vehicle.duringFlightOrientationTracking(dt);
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
   }
@@ -149,6 +184,8 @@ void loop() {
     Serial.println(); // Blank line between samples
   }
 =======
+=======
+>>>>>>> Stashed changes
   }
 
 
@@ -156,5 +193,8 @@ void loop() {
     telemetry.serialGyro();
     telemetry.serialBarometer();
     Serial.println();  // Blank line between samples
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 }

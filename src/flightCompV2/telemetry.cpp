@@ -1,6 +1,10 @@
 /*
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 * Header file ARC-S telemetry printouts
+=======
+* cpp file ARC-S telemetry printouts
+>>>>>>> Stashed changes
 =======
 * cpp file ARC-S telemetry printouts
 >>>>>>> Stashed changes
@@ -9,6 +13,7 @@
  * Created:   January 27, 2025
  * Edited:    January 27, 2025
  */
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
 #include "Telemetry.h"
@@ -67,6 +72,8 @@ void serialServoOutputs()
  Serial.println(vehicle.gyroAngle_deg.z / 90, 2); // Roll +X/-X
 }
 =======
+=======
+>>>>>>> Stashed changes
 #include "Telemetry.h"
 extern craftState vehicle;
 
@@ -129,4 +136,7 @@ void Telemetry::serialServoOutputs()
     Serial.print(vehicle.gyroAngle_deg.y, 2); Serial.print(",");
     Serial.println(vehicle.gyroAngle_deg.z / 90, 2);
 }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes

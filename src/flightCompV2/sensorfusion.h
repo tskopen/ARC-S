@@ -6,6 +6,7 @@
  * Edited:    Jan 28, 2025
  */
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 #include <Arduino_LSM6DSOX.h>
 #include <Adafruit_LIS3MDL.h>
@@ -28,6 +29,8 @@ class craftState
 {
     public:
 =======
+=======
+>>>>>>> Stashed changes
 #pragma once
 #ifndef SENSORFUSION_H
 #define SENSORFUSION_H
@@ -51,6 +54,9 @@ struct Vec3
 class craftState 
 {
 public:
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     // Raw sensors
     Vec3 accel_g;
@@ -63,7 +69,10 @@ public:
     Vec3 gravity_mps2;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
     double pitch = 0.0;
@@ -76,7 +85,11 @@ public:
 
     bool launch = false;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     bool apogee = false; //apogee can be cruising altitude for aircraft
+=======
+    bool apogee = false;
+>>>>>>> Stashed changes
 =======
     bool apogee = false;
 >>>>>>> Stashed changes
@@ -89,6 +102,7 @@ public:
     void preFlightOrientationTracking(double dt);
     void preFlightPositionalTracking(double dt);
     void readBarometerData();
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 
     void computeGravity()
@@ -106,6 +120,8 @@ public:
 };
 double getDeltaTime();
 =======
+=======
+>>>>>>> Stashed changes
     void computeGravity();
 };
 
@@ -117,5 +133,9 @@ extern BMP388_DEV bmp388;
 
 // Utility
 double getDeltaTime();
+<<<<<<< Updated upstream
+#endif // SENSORFUSION_H
+>>>>>>> Stashed changes
+=======
 #endif // SENSORFUSION_H
 >>>>>>> Stashed changes

@@ -17,17 +17,23 @@
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   Adafruit_LIS3MDL magnetometer;
   BMP388_DEV bmp388;
 
   craftState vehicle;
 
 =======
+=======
+>>>>>>> Stashed changes
   const double GRAVITY = 9.80665;
   craftState vehicle;
   Adafruit_LIS3MDL magnetometer;
   BMP388_DEV bmp388;
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 void craftState::initalizeSensors()
 {
@@ -160,8 +166,11 @@ void craftState::preFlightPositionalTracking(double dt)
   vehicle.deadReckoning_mps2.y = (vehicle.accel_g.y * 9.81) - vehicle.gravity_mps2.y;
   vehicle.deadReckoning_mps2.z = (vehicle.accel_g.z * 9.81) - vehicle.gravity_mps2.z;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 }
 =======
+=======
+>>>>>>> Stashed changes
 }
 void craftState::computeGravity()
     {
@@ -173,5 +182,9 @@ void craftState::computeGravity()
         gravity_mps2.x = 9.81 * sin(pitch);
         gravity_mps2.y = 9.81 * sin(roll);
         gravity_mps2.z = sqrt(9.81*9.81 - gravity_mps2.x*gravity_mps2.x - gravity_mps2.y*gravity_mps2.y);
+<<<<<<< Updated upstream
+    }
+>>>>>>> Stashed changes
+=======
     }
 >>>>>>> Stashed changes

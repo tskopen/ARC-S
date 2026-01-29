@@ -21,8 +21,13 @@ public:
     void serialBarometer();
     void serialServoOutputs();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 };
+=======
+};
+
+>>>>>>> Stashed changes
 =======
 };
 
