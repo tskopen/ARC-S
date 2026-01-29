@@ -16,11 +16,19 @@
 #include <sensorfusion.h>
 
 
+<<<<<<< Updated upstream
   Adafruit_LIS3MDL magnetometer;
   BMP388_DEV bmp388;
 
   craftState vehicle;
 
+=======
+  const double GRAVITY = 9.80665;
+  craftState vehicle;
+  Adafruit_LIS3MDL magnetometer;
+  BMP388_DEV bmp388;
+
+>>>>>>> Stashed changes
 void craftState::initalizeSensors()
 {
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE
@@ -151,4 +159,19 @@ void craftState::preFlightPositionalTracking(double dt)
   vehicle.deadReckoning_mps2.x = (vehicle.accel_g.x * 9.81) - vehicle.gravity_mps2.x;
   vehicle.deadReckoning_mps2.y = (vehicle.accel_g.y * 9.81) - vehicle.gravity_mps2.y;
   vehicle.deadReckoning_mps2.z = (vehicle.accel_g.z * 9.81) - vehicle.gravity_mps2.z;
+<<<<<<< Updated upstream
 }
+=======
+}
+void craftState::computeGravity()
+    {
+        // Compute pitch and roll from accelerometer
+        pitch = atan2(accel_g.x, sqrt(accel_g.y*accel_g.y + accel_g.z*accel_g.z));
+        roll  = atan2(accel_g.y, sqrt(accel_g.x*accel_g.x + accel_g.z*accel_g.z));
+
+        // Gravity vector in sensor frame (m/s²)
+        gravity_mps2.x = 9.81 * sin(pitch);
+        gravity_mps2.y = 9.81 * sin(roll);
+        gravity_mps2.z = sqrt(9.81*9.81 - gravity_mps2.x*gravity_mps2.x - gravity_mps2.y*gravity_mps2.y);
+    }
+>>>>>>> Stashed changes

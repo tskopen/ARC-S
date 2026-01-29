@@ -20,5 +20,10 @@ public:
     void serialMagnometer();
     void serialBarometer();
     void serialServoOutputs();
+<<<<<<< Updated upstream
 
 };
+=======
+};
+
+>>>>>>> Stashed changes

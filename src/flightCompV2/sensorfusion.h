@@ -5,6 +5,7 @@
  * Created:   November 17, 2025
  * Edited:    Jan 28, 2025
  */
+<<<<<<< Updated upstream
 
 #include <Arduino_LSM6DSOX.h>
 #include <Adafruit_LIS3MDL.h>
@@ -26,6 +27,31 @@ struct Vec3 {
 class craftState
 {
     public:
+=======
+#pragma once
+#ifndef SENSORFUSION_H
+#define SENSORFUSION_H
+#include <Arduino_LSM6DSOX.h>
+#include <Adafruit_LIS3MDL.h>
+#include <BMP388_DEV.h>
+
+// I2C addresses
+#define LSM6DSOX_ADDR 0x6B 
+#define LIS3MDL_ADDR 0x1E
+
+// Forward declarations of structs/classes
+struct Vec3 
+{
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
+    void zero();
+};
+
+class craftState 
+{
+public:
+>>>>>>> Stashed changes
     // Raw sensors
     Vec3 accel_g;
     Vec3 gyro_dps;
@@ -36,7 +62,10 @@ class craftState
     Vec3 gyroAngle_deg;
     Vec3 gravity_mps2;
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     double pitch = 0.0;
     double roll = 0.0;
     double yaw = 0.0;
@@ -46,7 +75,11 @@ class craftState
     float altitude_m;
 
     bool launch = false;
+<<<<<<< Updated upstream
     bool apogee = false; //apogee can be cruising altitude for aircraft
+=======
+    bool apogee = false;
+>>>>>>> Stashed changes
     bool landed = false;
 
     void initalizeSensors();
@@ -56,6 +89,7 @@ class craftState
     void preFlightOrientationTracking(double dt);
     void preFlightPositionalTracking(double dt);
     void readBarometerData();
+<<<<<<< Updated upstream
 
     void computeGravity()
     {
@@ -71,3 +105,17 @@ class craftState
 
 };
 double getDeltaTime();
+=======
+    void computeGravity();
+};
+
+// Global constants and objects declared as extern
+extern const double GRAVITY;
+extern craftState vehicle;
+extern Adafruit_LIS3MDL magnetometer;
+extern BMP388_DEV bmp388;
+
+// Utility
+double getDeltaTime();
+#endif // SENSORFUSION_H
+>>>>>>> Stashed changes
