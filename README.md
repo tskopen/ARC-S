@@ -1,5 +1,10 @@
 # Experimental Flight Computer
 
+License: All Rights Reserved
+This code is publicly visible for review and evaluation only.
+No reuse or redistribution is permitted.
+
+
 This project is a Software impletementation of a flight computer for the ARC-S flight computer.
 ## Features
 
