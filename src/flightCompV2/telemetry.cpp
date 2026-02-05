@@ -3,12 +3,11 @@
  *
  * Name:      Thor Kopenkoskey
  * Created:   January 27, 2025
- * Edited:    January 27, 2025
+ * Edited:    February 27, 2025
  */
+
 #include "Telemetry.h"
 extern craftState vehicle;
-
-// -------------------- Telemetry.cpp --------------------
 
 void Telemetry::serialIMU() 
 {

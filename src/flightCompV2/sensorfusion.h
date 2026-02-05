@@ -5,6 +5,7 @@
  * Created:   November 17, 2025
  * Edited:    Jan 28, 2025
  */
+
 #pragma once
 #ifndef SENSORFUSION_H
 #define SENSORFUSION_H
@@ -12,11 +13,9 @@
 #include <Adafruit_LIS3MDL.h>
 #include <BMP388_DEV.h>
 
-// I2C addresses
 #define LSM6DSOX_ADDR 0x6B 
 #define LIS3MDL_ADDR 0x1E
 
-// Forward declarations of structs/classes
 struct Vec3 
 {
     double x = 0.0;

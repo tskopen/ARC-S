@@ -1,11 +1,19 @@
 /*
+ * Websocket File for communication with tskopen.com, Future web ground station UI for portability and multi computer access.
+ *
+ * Name:      Thor Kopenkoskey
+ * Created:   January 25, 2025
+ * Edited:    November 17, 2025
+ */
+ 
+
+/*
 Compile command:
 clang++ -std=c++17 -o websocket websocket.cpp \
   -I/opt/homebrew/include \
   -I/opt/homebrew/opt/boost/include \
   -L/opt/homebrew/opt/boost/lib \
   -lpthread
-
   */
 
 #include <boost/beast/core.hpp>

@@ -15,8 +15,6 @@
 #define EEPROM_SIZE 64   // adjust if you add more data
 #define EEPROM_START 0   // start address
 
-
-
 struct AxisServo 
 {
   String name;
@@ -48,7 +46,4 @@ void pitchYawControlLoop();
 void rollControlLoop();
 extern const int NUM_SERVOS;
 extern AxisServo servos[];
-
-
-
 #endif

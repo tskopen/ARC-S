@@ -15,7 +15,6 @@
 #include <BMP388_DEV.h>
 #include <sensorfusion.h>
 
-
   const double GRAVITY = 9.80665;
   craftState vehicle;
   Adafruit_LIS3MDL magnetometer;
@@ -27,9 +26,6 @@ void craftState::initalizeSensors()
   bmp388.setTimeStandby(TIME_STANDBY_1280MS);     // Set the standby time to 1.3 seconds
   bmp388.startNormalConversion();
 
-  // =====================
-  // IMU
-  // =====================
   if (!IMU.begin())
   {
     Serial.println("IMU failed!");
@@ -38,8 +34,6 @@ void craftState::initalizeSensors()
   {
     Serial.println("IMU OK");
   }
-  // Magnetometer (I2C)
-  // =====================
 
   if (!magnetometer.begin_I2C(LIS3MDL_ADDR, &Wire))
   {
@@ -115,9 +109,6 @@ void craftState::duringFlightOrientationTracking(double dt)
     vehicle.gyroAngle_deg.z += vehicle.gyro_dps.z * dt;
 }
 
-
-
-
 void craftState::duringFlightPositionalTracking(double dt)
 {
   vehicle.deadReckoning_mps2.x += (vehicle.accel_g.x * GRAVITY * dt);
@@ -132,21 +123,20 @@ void craftState::preFlightOrientationTracking(double dt)
   vehicle.gyroAngle_deg.x = alpha * vehicle.gyroAngle_deg.x + (1 - alpha) * (vehicle.pitch * 180.0 / PI);
   vehicle.gyroAngle_deg.y = alpha * vehicle.gyroAngle_deg.y + (1 - alpha) * (vehicle.roll * 180.0 / PI);
 
-  //Correct yaw with fusiong Magnometer
+  //Correct yaw with fusion Magnometer
   vehicle.yaw = atan2(vehicle.mag_uT.y, vehicle.mag_uT.x) * (180.0 / PI); // degrees
   if (vehicle.yaw < 0) vehicle.yaw += 360.0; // Normalize to 0-360
 
   vehicle.gyroAngle_deg.z = alpha * vehicle.gyroAngle_deg.z + (1 - alpha) * vehicle.yaw;;
-
 }
 
 void craftState::preFlightPositionalTracking(double dt)
 {
-  vehicle.deadReckoning_mps2.x += vehicle.gyroAngle_deg.x / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
-  vehicle.deadReckoning_mps2.y += vehicle.gyroAngle_deg.y / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
-  vehicle.deadReckoning_mps2.z += vehicle.gyroAngle_deg.z / dt; // 9.81 g to m/s2 gravity, 104 sensor hz
+  vehicle.deadReckoning_mps2.x += vehicle.gyroAngle_deg.x / dt; 
+  vehicle.deadReckoning_mps2.y += vehicle.gyroAngle_deg.y / dt; 
+  vehicle.deadReckoning_mps2.z += vehicle.gyroAngle_deg.z / dt; 
 
-  vehicle.computeGravity();
+  vehicle.computeGravity(); //Gives Gravity IMU Offset
 
   vehicle.deadReckoning_mps2.x = (vehicle.accel_g.x * 9.81) - vehicle.gravity_mps2.x;
   vehicle.deadReckoning_mps2.y = (vehicle.accel_g.y * 9.81) - vehicle.gravity_mps2.y;
@@ -157,7 +147,7 @@ void craftState::computeGravity()
         // Compute pitch and roll from accelerometer
         pitch = atan2(accel_g.x, sqrt(accel_g.y*accel_g.y + accel_g.z*accel_g.z));
         roll  = atan2(accel_g.y, sqrt(accel_g.x*accel_g.x + accel_g.z*accel_g.z));
-
+        
         // Gravity vector in sensor frame (m/s²)
         gravity_mps2.x = 9.81 * sin(pitch);
         gravity_mps2.y = 9.81 * sin(roll);

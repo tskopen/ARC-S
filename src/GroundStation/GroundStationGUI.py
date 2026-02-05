@@ -1,3 +1,13 @@
+
+""" 
+ * Python Code for ground station UI
+ *
+ * Name:      Thor Kopenkoskey
+ * Created:   January 25, 2025
+ * Edited:    November 17, 2025
+ """
+
+
 import dearpygui.dearpygui as dpg
 import serial
 import collections

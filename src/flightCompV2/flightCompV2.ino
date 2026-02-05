@@ -19,7 +19,8 @@ Telemetry telemetry;
 
 extern craftState vehicle;
 
-void setup() {
+void setup() 
+{
   delay(300);
   Serial.begin(115200);
   delay(2000);
@@ -50,11 +51,10 @@ void setup() {
   Serial.println("Servo system ready.");
 }
 
-
-void loop() {
+void loop() 
+{
   double dt = getDeltaTime();
   unsigned long currentTime = micros();
-
 
   readSerialAndUpdateServo();
 
@@ -66,7 +66,6 @@ void loop() {
   {
     rollControlLoop();
   }
-
 
   if (vehicle.launch == false) 
   {
@@ -85,7 +84,6 @@ void loop() {
     vehicle.duringFlightPositionalTracking(dt);
     vehicle.duringFlightOrientationTracking(dt);
   }
-
 
     telemetry.serialIMU();
     telemetry.serialGyro();

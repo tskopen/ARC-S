@@ -22,10 +22,7 @@ AxisServo servos[] =
   {"+X", Servo(), 6, initialOffset}
 };
 
-
-
 const int NUM_SERVOS = sizeof(servos) / sizeof(servos[0]);
-
 
 void writeServoOffsetEEPROM(int servoIndex)
 {
@@ -35,7 +32,6 @@ void writeServoOffsetEEPROM(int servoIndex)
   EEPROM.write(addr + 1, val & 0xFF);        // low byte
   EEPROM.commit();                             // save immediately
 }
-
 
 void loadOffsetsFromEEPROM() 
 {
@@ -55,8 +51,6 @@ void loadOffsetsFromEEPROM()
   }
 }
 
-
-// ---- Function: Process Command ----
 void processCommand(String cmd) 
 {
   cmd.trim();  // Remove whitespace
@@ -94,7 +88,6 @@ void processCommand(String cmd)
   }
 }
 
-
 void readSerialAndUpdateServo() 
 {
   while (Serial.available() > 0) 
@@ -125,7 +118,6 @@ void ControlServo(String name, float angle)
   }
 }
 
-
 float mapGyroToServo(float angle, float minAngle, float maxAngle) 
 {
   angle = constrain(angle, minAngle, maxAngle);
@@ -134,7 +126,6 @@ float mapGyroToServo(float angle, float minAngle, float maxAngle)
              minAngle * 100, maxAngle * 100,
              -500, 500); // ±500 µs authority
 }
-
 
 void pitchYawControlLoop() 
 {
@@ -145,10 +136,8 @@ void pitchYawControlLoop()
   // Y-axis rotation controlled by servos on X-axis
   ControlServo("+X", -1 * vehicle.gyroAngle_deg.y);
   ControlServo("-X", vehicle.gyroAngle_deg.x);
-
-
-
 }
+
 void rollControlLoop() 
 {
   // X-axis rotation controlled by servos on Y-axis
@@ -156,5 +145,4 @@ void rollControlLoop()
   //ControlServo("-Y", -1 * gyroPositionZAxis);
   ControlServo("+X", vehicle.gyroAngle_deg.z / 90); //90 DPS authority limitor
   ControlServo("-X", vehicle.gyroAngle_deg.z / 90);
-
 }
