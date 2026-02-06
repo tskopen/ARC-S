@@ -51,15 +51,19 @@ void setup()
   Serial.println("Servo system ready.");
 }
 
+const uint32_t LOOP_US = 1000; // 1 kHz
+static uint32_t lastLoop = 0;
+
 void loop() 
 {
-  double dt = getDeltaTime();
-  unsigned long currentTime = micros();
+    uint32_t now = micros();
+    if (now - lastLoop < LOOP_US) return;
 
+    float dt = (now - lastLoop) * 1e-6;
+    lastLoop = now;
   readSerialAndUpdateServo();
 
   vehicle.readGAM();
-  vehicle.readBarometerData();
   pitchYawControlLoop();
 
   if (vehicle.gyro_dps.z > 90) 
@@ -85,8 +89,7 @@ void loop()
     vehicle.duringFlightOrientationTracking(dt);
   }
 
-    telemetry.serialIMU();
-    telemetry.serialGyro();
-    telemetry.serialBarometer();
+    telemetry.serialServoOutputs();
     Serial.println();  // Blank line between samples
+    delay(10);
 }

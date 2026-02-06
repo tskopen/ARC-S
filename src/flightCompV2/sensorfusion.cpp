@@ -20,6 +20,9 @@
   Adafruit_LIS3MDL magnetometer;
   BMP388_DEV bmp388;
 
+  float ax = 0, ay = 0, az = 0;
+  float gx = 0, gy = 0, gz = 0;
+  float t = 0, p = 0, a = 0;
 void craftState::initalizeSensors()
 {
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE
@@ -45,23 +48,28 @@ void craftState::initalizeSensors()
   }
 }
 
-double getDeltaTime()
-{
-  static unsigned long lastTime = 0;         // remembers last call
-  unsigned long currentTime = micros();      // current time in microseconds
+double getDeltaTime() {
+    static uint32_t last = micros();
+    uint32_t now = micros();
 
-  double dt = (currentTime - lastTime) / 1e6; // convert to seconds, sensors report MS and DPS
+    uint32_t delta = now - last;
+    if (delta == 0) return 0;
 
-  lastTime = currentTime;
-
-  return dt;
+    last = now;
+    return delta * 1e-6;
 }
+
 
 void craftState::readBarometerData()
 {
   float t, p, a;
+  if (!isfinite(vehicle.altitude_m) ||
+      !isfinite(vehicle.pressure_Pa)) {
+      Serial.print("0.00,0.00,0.00");
+      return;
+  }
 
-  if (bmp388.getMeasurements(t, p, a))
+  else if (bmp388.getMeasurements(t, p, a))
   {
     vehicle.temperature_C = t;
     vehicle.pressure_Pa   = p;
@@ -111,6 +119,7 @@ void craftState::duringFlightOrientationTracking(double dt)
 
 void craftState::duringFlightPositionalTracking(double dt)
 {
+   
   vehicle.deadReckoning_mps2.x += (vehicle.accel_g.x * GRAVITY * dt);
   vehicle.deadReckoning_mps2.y += (vehicle.accel_g.y * GRAVITY * dt);
   vehicle.deadReckoning_mps2.z += (vehicle.accel_g.z * GRAVITY * dt);
@@ -132,9 +141,7 @@ void craftState::preFlightOrientationTracking(double dt)
 
 void craftState::preFlightPositionalTracking(double dt)
 {
-  vehicle.deadReckoning_mps2.x += vehicle.gyroAngle_deg.x / dt; 
-  vehicle.deadReckoning_mps2.y += vehicle.gyroAngle_deg.y / dt; 
-  vehicle.deadReckoning_mps2.z += vehicle.gyroAngle_deg.z / dt; 
+  if (dt < 1e-6) return;
 
   vehicle.computeGravity(); //Gives Gravity IMU Offset
 
