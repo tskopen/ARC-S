@@ -23,6 +23,7 @@
   float ax = 0, ay = 0, az = 0;
   float gx = 0, gy = 0, gz = 0;
   float t = 0, p = 0, a = 0;
+
 void craftState::initalizeSensors()
 {
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE
@@ -92,7 +93,8 @@ void craftState::readGAM()
   {
     IMU.readGyroscope(gx, gy, gz);
   }
-
+  //WHERE YOU SWITCH OUT AXIS's BASED ON SENSOR POSITION, What is Vehicle's X compared to the senors X? Is Sensors X really Vehicles Y?
+  //CONFORM TO VEHICLE.
   vehicle.accel_g.x = ax;
   vehicle.accel_g.y = ay;
   vehicle.accel_g.z = az;
