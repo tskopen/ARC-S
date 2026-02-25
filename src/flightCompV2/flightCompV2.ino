@@ -61,6 +61,7 @@ void loop()
 
     float dt = (now - lastLoop) * 1e-6;
     lastLoop = now;
+
   readSerialAndUpdateServo();
 
   vehicle.readGAM();
