@@ -33,9 +33,12 @@ public:
     Vec3 mag_uT;
 
     // Derived state
-    Vec3 deadReckoning_mps2;
+    Vec3 velocity_mps;
     Vec3 gyroAngle_deg;
     Vec3 gravity_mps2;
+
+    //Derived position
+    Vec3 deadReckoningPosition_m;
 
     double pitch = 0.0;
     double roll = 0.0;

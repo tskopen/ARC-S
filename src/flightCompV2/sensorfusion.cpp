@@ -122,9 +122,15 @@ void craftState::duringFlightOrientationTracking(double dt)
 void craftState::duringFlightPositionalTracking(double dt)
 {
    
-  vehicle.deadReckoning_mps2.x += (vehicle.accel_g.x * GRAVITY * dt);
-  vehicle.deadReckoning_mps2.y += (vehicle.accel_g.y * GRAVITY * dt);
-  vehicle.deadReckoning_mps2.z += (vehicle.accel_g.z * GRAVITY * dt);
+  vehicle.velocity_mps.x += (vehicle.accel_g.x * GRAVITY * dt);
+  vehicle.velocity_mps.y += (vehicle.accel_g.y * GRAVITY * dt);
+  vehicle.velocity_mps.z += (vehicle.accel_g.z * GRAVITY * dt);
+
+  vehicle.deadReckoningPosition_m.x += vehicle.velocity_mps.x * dt;
+  vehicle.deadReckoningPosition_m.y += vehicle.velocity_mps.y * dt;
+  vehicle.deadReckoningPosition_m.z += vehicle.velocity_mps.z * dt;
+
+
 }
 
 void craftState::preFlightOrientationTracking(double dt)
@@ -147,9 +153,9 @@ void craftState::preFlightPositionalTracking(double dt)
 
   vehicle.computeGravity(); //Gives Gravity IMU Offset
 
-  vehicle.deadReckoning_mps2.x = (vehicle.accel_g.x * 9.81) - vehicle.gravity_mps2.x;
-  vehicle.deadReckoning_mps2.y = (vehicle.accel_g.y * 9.81) - vehicle.gravity_mps2.y;
-  vehicle.deadReckoning_mps2.z = (vehicle.accel_g.z * 9.81) - vehicle.gravity_mps2.z;
+  vehicle.velocity_mps.x = (vehicle.accel_g.x * 9.81) - vehicle.gravity_mps2.x;
+  vehicle.velocity_mps.y = (vehicle.accel_g.y * 9.81) - vehicle.gravity_mps2.y;
+  vehicle.velocity_mps.z = (vehicle.accel_g.z * 9.81) - vehicle.gravity_mps2.z;
 }
 void craftState::computeGravity()
     {

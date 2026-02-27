@@ -20,9 +20,9 @@ void Telemetry::serialIMU()
 void Telemetry::serialIMUDeadReckoning() 
 {
     // CSV format: DR_X,DR_Y,DR_Z
-    Serial.print(vehicle.deadReckoning_mps2.x, 3); Serial.print(",");
-    Serial.print(vehicle.deadReckoning_mps2.y, 3); Serial.print(",");
-    Serial.println(vehicle.deadReckoning_mps2.z, 3);
+    Serial.print(vehicle.deadReckoningPosition_m.x, 3); Serial.print(",");
+    Serial.print(vehicle.deadReckoningPosition_m.y, 3); Serial.print(",");
+    Serial.println(vehicle.deadReckoningPosition_m.z, 3);
 }
 
 void Telemetry::serialGyro() 
