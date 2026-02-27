@@ -21,6 +21,7 @@ struct AxisServo
   Servo servo;
   int pin;
   int offset; // center in microseconds
+  int direction;
 
   void init_servo() 
   {
@@ -32,11 +33,11 @@ struct AxisServo
   void writeDeltaUs(int deltaUs) 
   {
     int pulse = offset + deltaUs;
-    pulse = constrain(pulse, 1500, 3000);
+    pulse = constrain(pulse, 500, 2500);
     servo.writeMicroseconds(pulse);
   }
 };
-
+inline int clampServoUs(int us);
 void loadOffsetsFromEEPROM();
 void readSerialAndUpdateServo();
 void processCommand(String cmd);

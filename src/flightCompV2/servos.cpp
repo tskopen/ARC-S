@@ -14,12 +14,23 @@ extern craftState vehicle;
 int initialOffset = 1500;
 String inputString = "";
 
+constexpr int SERVO_MIN_US = 500;
+constexpr int SERVO_MAX_US = 2500;
+constexpr int SERVO_CENTER_US = 1500;
+constexpr int SERVO_AUTHORITY_US = 500; // ± authority from center
+
+
+inline int clampServoUs(int us)
+{
+  return constrain(us, SERVO_MIN_US, SERVO_MAX_US);
+}
+
 AxisServo servos[] = 
 {
-  {"+Y", Servo(), 3, initialOffset},
-  {"-X", Servo(), 4, initialOffset},
-  {"-Y", Servo(), 5, initialOffset},
-  {"+X", Servo(), 6, initialOffset}
+  {"+Y", Servo(), 3, initialOffset, 1},
+  {"-X", Servo(), 4, initialOffset, 1},
+  {"-Y", Servo(), 5, initialOffset, 1},
+  {"+X", Servo(), 6, initialOffset, 1}
 };
 
 const int NUM_SERVOS = sizeof(servos) / sizeof(servos[0]);
@@ -42,7 +53,7 @@ void loadOffsetsFromEEPROM()
     if (val != 0xFFFF) 
     { // ignore empty EEPROM
       servos[i].offset = val;
-      servos[i].servo.writeMicroseconds(val); // center servo
+      servos[i].servo.writeMicroseconds(clampServoUs(val)); // center servo
       Serial.print("Loaded ");
       Serial.print(servos[i].name);
       Serial.print(" offset: ");
@@ -76,7 +87,7 @@ void processCommand(String cmd)
     if (servos[i].name == servoName) 
     {
       servos[i].offset = newOffset;  // Update offset
-      servos[i].servo.writeMicroseconds(newOffset);  // Move servo
+      servos[i].servo.writeMicroseconds(clampServoUs(newOffset));  // Move servo
       Serial.print("Updated ");
       Serial.print(servoName);
       Serial.print(" to offset ");
@@ -130,11 +141,11 @@ float mapGyroToServo(float angle, float minAngle, float maxAngle)
 void pitchYawControlLoop() 
 {
   // X-axis rotation controlled by servos on Y-axis
-  ControlServo("+Y", vehicle.gyroAngle_deg.x);
-  ControlServo("-Y", -1 * vehicle.gyroAngle_deg.x);
+  ControlServo("+Y", vehicle.gyroAngle_deg.y);
+  ControlServo("-Y", -1 * vehicle.gyroAngle_deg.y);
 
   // Y-axis rotation controlled by servos on X-axis
-  ControlServo("+X", -1 * vehicle.gyroAngle_deg.y);
+  ControlServo("+X", -1 * vehicle.gyroAngle_deg.x);
   ControlServo("-X", vehicle.gyroAngle_deg.x);
 }
 
