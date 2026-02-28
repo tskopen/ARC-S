@@ -57,25 +57,43 @@ void setup()
   Serial.println("Servo system ready.");
 
   //Calibrate sensors
+  vehicle.readGAM();
   vehicle.calibrateGyroBias();
+
 }
 
 const uint32_t LOOP_US = 1000; // 1 kHz
 static uint32_t lastLoop = 0;
-
+uint32_t setupFinish = micros();
 void loop() 
 {
+
+  uint8_t error = Wire.endTransmission();
+  if (error != 0 && error != 2) 
+  {  // 2 = NACK (expected), other errors indicate problems
+    Serial.print("WARNING: I2C bus test returned error code: ");
+    Serial.println(error);
+  }
+
     uint32_t now = micros();
     if (now - lastLoop < LOOP_US) return;
 
     float dt = (now - lastLoop) * 1e-6;
     lastLoop = now;
-
+  
   readSerialAndUpdateServo();
 
   vehicle.readGAM();
 
+  //calibrate after 1 second of looping for warmup and calibration
+  static bool gyroCalibrated = false;
 
+  // Run once after 1 second, this allows sensor to warm up
+  if (!gyroCalibrated && (now - setupFinish >= 1000))
+  {
+      vehicle.calibrateGyroBias();
+      gyroCalibrated = true;
+  }
 
   if (vehicle.launch == false) 
   {
@@ -97,5 +115,7 @@ void loop()
     flightControlUpdate();
 
     telemetry.serialGyro();
-    delay(100);
+    delay(1);
 }
+
+ 

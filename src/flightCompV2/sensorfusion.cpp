@@ -80,7 +80,7 @@ void craftState::readBarometerData()
 }
 void craftState::calibrateGyroBias()
 {
-    const int N = 1000;     
+    const int N = 100;     
     Vec3 sum;
 
     for (int i = 0; i < N; i++)
@@ -93,7 +93,7 @@ void craftState::calibrateGyroBias()
             sum.y += gy;
             sum.z += gz;
         }
-        delay(3);
+        delay(10);
     }
 
     gyro_bias_dps.x = sum.x / N;

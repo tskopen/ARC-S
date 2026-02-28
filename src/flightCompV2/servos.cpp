@@ -184,7 +184,7 @@ void rollControlLoop()
     float rollCmd = (vehicle.gyroAngle_deg.z / 90.0f) * KP_ROLL;
 
     servoMix.posX += rollCmd;
-    servoMix.negX += -rollCmd;
+    servoMix.negX += rollCmd;
 }
 
 void applyServoMix()
