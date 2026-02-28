@@ -135,7 +135,7 @@ void craftState::duringFlightPositionalTracking(double dt)
 
 void craftState::preFlightOrientationTracking(double dt)
 {
-  const float alpha = 0.50;
+  const float alpha = 0.98;
   //Corect pitch/roll with IMU while static
   vehicle.gyroAngle_deg.x = alpha * vehicle.gyroAngle_deg.x + (1 - alpha) * (vehicle.pitch * 180.0 / PI);
   vehicle.gyroAngle_deg.y = alpha * vehicle.gyroAngle_deg.y + (1 - alpha) * (vehicle.roll * 180.0 / PI);
@@ -151,13 +151,14 @@ void craftState::preFlightPositionalTracking(double dt)
 {
   if (dt < 1e-6) return;
 
-  vehicle.computeGravity(); //Gives Gravity IMU Offset
+  vehicle.computeGravityWhileStationary(); //Gives Gravity IMU Offset
 
   vehicle.velocity_mps.x = (vehicle.accel_g.x * 9.81) - vehicle.gravity_mps2.x;
   vehicle.velocity_mps.y = (vehicle.accel_g.y * 9.81) - vehicle.gravity_mps2.y;
   vehicle.velocity_mps.z = (vehicle.accel_g.z * 9.81) - vehicle.gravity_mps2.z;
 }
-void craftState::computeGravity()
+
+void craftState::computeGravityWhileStationary()
     {
         // Compute pitch and roll from accelerometer
         pitch = atan2(accel_g.x, sqrt(accel_g.y*accel_g.y + accel_g.z*accel_g.z));
@@ -168,3 +169,4 @@ void craftState::computeGravity()
         gravity_mps2.y = 9.81 * sin(roll);
         gravity_mps2.z = sqrt(9.81*9.81 - gravity_mps2.x*gravity_mps2.x - gravity_mps2.y*gravity_mps2.y);
     }
+

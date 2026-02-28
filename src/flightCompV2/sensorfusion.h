@@ -59,7 +59,7 @@ public:
     void preFlightOrientationTracking(double dt);
     void preFlightPositionalTracking(double dt);
     void readBarometerData();
-    void computeGravity();
+    void computeGravityWhileStationary();
 };
 
 // Global constants and objects declared as extern
