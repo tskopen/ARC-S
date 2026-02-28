@@ -34,7 +34,10 @@ public:
 
     // Derived state
     Vec3 velocity_mps;
+    
     Vec3 gyroAngle_deg;
+    Vec3 gyro_bias_dps;
+
     Vec3 gravity_mps2;
 
     //Derived position
@@ -60,6 +63,7 @@ public:
     void preFlightPositionalTracking(double dt);
     void readBarometerData();
     void computeGravityWhileStationary();
+    void calibrateGyroBias();
 };
 
 // Global constants and objects declared as extern

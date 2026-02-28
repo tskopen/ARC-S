@@ -23,7 +23,8 @@ void setup()
 {
   delay(300);
   Serial.begin(115200);
-  delay(2000);
+  delay(1000);
+  
   Serial.println("Serial OK");
 
   EEPROM.begin(EEPROM_SIZE);
@@ -31,10 +32,14 @@ void setup()
   Wire.begin(I2C_SDA, I2C_SCL);
   Wire.setClock(100000);
   Wire.setTimeout(1000);
+
   delay(100);
-  Wire.beginTransmission(0x00);  // General call address (should always NACK, but tests bus)
+
+  Wire.beginTransmission(0x00);  
+
   uint8_t error = Wire.endTransmission();
-  if (error != 0 && error != 2) {  // 2 = NACK (expected), other errors indicate problems
+  if (error != 0 && error != 2) 
+  {  // 2 = NACK (expected), other errors indicate problems
     Serial.print("WARNING: I2C bus test returned error code: ");
     Serial.println(error);
   }
@@ -43,12 +48,16 @@ void setup()
 
   vehicle.initalizeSensors();
 
-  for (int i = 0; i < NUM_SERVOS; i++) {
+  for (int i = 0; i < NUM_SERVOS; i++) 
+  {
     servos[i].init_servo();
   }
 
   loadOffsetsFromEEPROM();  // restore trims on startup
   Serial.println("Servo system ready.");
+
+  //Calibrate sensors
+  vehicle.calibrateGyroBias();
 }
 
 const uint32_t LOOP_US = 1000; // 1 kHz
@@ -65,12 +74,8 @@ void loop()
   readSerialAndUpdateServo();
 
   vehicle.readGAM();
-  pitchYawControlLoop();
 
-  if (vehicle.gyro_dps.z > 90) 
-  {
-    rollControlLoop();
-  }
+
 
   if (vehicle.launch == false) 
   {
@@ -85,12 +90,12 @@ void loop()
 
   if (vehicle.launch == true) 
   {
-
     vehicle.duringFlightPositionalTracking(dt);
     vehicle.duringFlightOrientationTracking(dt);
   }
 
-    telemetry.serialServoOutputs();
-    Serial.println();  // Blank line between samples
-    delay(10);
+    flightControlUpdate();
+
+    telemetry.serialGyro();
+    delay(100);
 }

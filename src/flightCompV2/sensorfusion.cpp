@@ -78,7 +78,33 @@ void craftState::readBarometerData()
   }
 
 }
+void craftState::calibrateGyroBias()
+{
+    const int N = 1000;     
+    Vec3 sum;
 
+    for (int i = 0; i < N; i++)
+    {
+        float gx, gy, gz;
+        if (IMU.gyroscopeAvailable())
+        {
+            IMU.readGyroscope(gx, gy, gz);
+            sum.x += gx;
+            sum.y += gy;
+            sum.z += gz;
+        }
+        delay(3);
+    }
+
+    gyro_bias_dps.x = sum.x / N;
+    gyro_bias_dps.y = sum.y / N;
+    gyro_bias_dps.z = sum.z / N;
+
+    Serial.println("Gyro bias calibrated:");
+    Serial.print(gyro_bias_dps.x); Serial.print(", ");
+    Serial.print(gyro_bias_dps.y); Serial.print(", ");
+    Serial.println(gyro_bias_dps.z);
+}
 //GAM = Gyro, Accel, Magno
 void craftState::readGAM()
 {
@@ -99,9 +125,9 @@ void craftState::readGAM()
   vehicle.accel_g.y = ay;
   vehicle.accel_g.z = az;
 
-  vehicle.gyro_dps.x = gx;
-  vehicle.gyro_dps.y = gy;
-  vehicle.gyro_dps.z = gz;
+  vehicle.gyro_dps.x = gx - gyro_bias_dps.x; //See bias function, remove gyro basis due too... whatever external consistent factors...
+  vehicle.gyro_dps.y = gy - gyro_bias_dps.y;
+  vehicle.gyro_dps.z = gz - gyro_bias_dps.z;
 
   sensors_event_t magEvent;
   magnetometer.getEvent(&magEvent);
@@ -159,14 +185,14 @@ void craftState::preFlightPositionalTracking(double dt)
 }
 
 void craftState::computeGravityWhileStationary()
-    {
-        // Compute pitch and roll from accelerometer
-        pitch = atan2(accel_g.x, sqrt(accel_g.y*accel_g.y + accel_g.z*accel_g.z));
-        roll  = atan2(accel_g.y, sqrt(accel_g.x*accel_g.x + accel_g.z*accel_g.z));
+{
+    // Compute pitch and roll from accelerometer
+    pitch = atan2(accel_g.x, sqrt(accel_g.y*accel_g.y + accel_g.z*accel_g.z));
+    roll  = atan2(accel_g.y, sqrt(accel_g.x*accel_g.x + accel_g.z*accel_g.z));
         
-        // Gravity vector in sensor frame (m/s²)
-        gravity_mps2.x = 9.81 * sin(pitch);
-        gravity_mps2.y = 9.81 * sin(roll);
-        gravity_mps2.z = sqrt(9.81*9.81 - gravity_mps2.x*gravity_mps2.x - gravity_mps2.y*gravity_mps2.y);
-    }
+     // Gravity vector in sensor frame (m/s²)
+    gravity_mps2.x = 9.81 * sin(pitch);
+     gravity_mps2.y = 9.81 * sin(roll);
+     gravity_mps2.z = sqrt(9.81 * 9.81 - gravity_mps2.x*gravity_mps2.x - gravity_mps2.y * gravity_mps2.y);
+}
 

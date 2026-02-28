@@ -137,23 +137,70 @@ float mapGyroToServo(float angle, float minAngle, float maxAngle)
              minAngle * 100, maxAngle * 100,
              -500, 500); // ±500 µs authority
 }
+// Control Loop
 
-void pitchYawControlLoop() 
+struct ServoMix {
+    float posX = 0.0f;
+    float negX = 0.0f;
+    float posY = 0.0f;
+    float negY = 0.0f;
+};
+
+ServoMix servoMix;
+
+float clamp(float value, float minValue, float maxValue)
 {
-  // X-axis rotation controlled by servos on Y-axis
-  ControlServo("+Y", vehicle.gyroAngle_deg.y);
-  ControlServo("-Y", -1 * vehicle.gyroAngle_deg.y);
-
-  // Y-axis rotation controlled by servos on X-axis
-  ControlServo("+X", -1 * vehicle.gyroAngle_deg.x);
-  ControlServo("-X", vehicle.gyroAngle_deg.x);
+    if (value < minValue) return minValue;
+    if (value > maxValue) return maxValue;
+    return value;
 }
 
-void rollControlLoop() 
+void flightControlUpdate()
 {
-  // X-axis rotation controlled by servos on Y-axis
-  //ControlServo("+Y", gyroPositionZAxis);
-  //ControlServo("-Y", -1 * gyroPositionZAxis);
-  ControlServo("+X", vehicle.gyroAngle_deg.z / 90); //90 DPS authority limitor
-  ControlServo("-X", vehicle.gyroAngle_deg.z / 90);
+    servoMix = {};              // clear accumulator
+
+    pitchYawControlLoop();      // add pitch + yaw
+    rollControlLoop();          // add roll
+
+    applyServoMix();            // send once
+}
+
+void pitchYawControlLoop()
+{
+    float pitchCmd = vehicle.gyroAngle_deg.y * KP_PITCH;
+    float yawCmd   = vehicle.gyroAngle_deg.x * KP_YAW;
+
+    // Pitch → Y-axis servos
+    servoMix.posY +=  pitchCmd;
+    servoMix.negY += pitchCmd;
+
+    // Yaw → X-axis servos
+    servoMix.posX += yawCmd;
+    servoMix.negX +=  yawCmd;
+}
+
+void rollControlLoop()
+{
+    float rollCmd = (vehicle.gyroAngle_deg.z / 90.0f) * KP_ROLL;
+
+    servoMix.posX += rollCmd;
+    servoMix.negX += -rollCmd;
+}
+
+void applyServoMix()
+{
+    // Clamp all outputs
+    servoMix.posX = clamp(servoMix.posX, -SERVO_LIMIT_DEG, SERVO_LIMIT_DEG);
+    servoMix.negX = clamp(servoMix.negX, -SERVO_LIMIT_DEG, SERVO_LIMIT_DEG);
+    servoMix.posY = clamp(servoMix.posY, -SERVO_LIMIT_DEG, SERVO_LIMIT_DEG);
+    servoMix.negY = clamp(servoMix.negY, -SERVO_LIMIT_DEG, SERVO_LIMIT_DEG);
+
+    // Send to servos
+    ControlServo("+X", servoMix.posX);
+    ControlServo("-X", servoMix.negX);
+    ControlServo("+Y", servoMix.posY);
+    ControlServo("-Y", servoMix.negY);
+
+    // Reset for next cycle
+    servoMix = {};
 }
