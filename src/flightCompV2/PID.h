@@ -12,6 +12,7 @@
 #include <servos.h>
 #include <sensorfusion.h>
 
+
 struct PIDController
 {
     double Kp;
@@ -21,11 +22,14 @@ struct PIDController
     double integral;
     double prev_error;
 
+    double output_min;
+    double output_max;
+
     double integral_min;
     double integral_max;
 };
 
-void pid_init(PIDController *pid, double Kp, double Ki, double Kd, double integral_min, double integral_max);
+void pid_init(PIDController *pid, double Kp, double Ki, double Kd, double integral_min, double integral_max, double output_min, double output_max);
 
 double pid_update(PIDController *pid, double setpoint, double measurement, double dt);
 

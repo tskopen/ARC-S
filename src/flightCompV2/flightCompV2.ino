@@ -11,6 +11,7 @@
 #include <servos.h>
 #include "flash.h"
 #include "sdcard.h"
+#include "PID.h"
 Telemetry telemetry;
 
 #define SerialPort Serial

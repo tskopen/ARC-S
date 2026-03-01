@@ -6,11 +6,12 @@
  * Edited:    March 1, 2025
  */
 
-
+#include "PID.h"
 
 extern craftState vehicle;
+PIDController pid;
 
-void pid_init(PIDController *pid, double Kp, double Ki, double Kd, double integral_min, double integral_max)
+void pid_init(PIDController *pid, double Kp, double Ki, double Kd, double integral_min, double integral_max, double output_min, double output_max)
 {
     pid->Kp = Kp;
     pid->Ki = Ki;
