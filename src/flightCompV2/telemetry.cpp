@@ -3,9 +3,8 @@
  *
  * Name:      Thor Kopenkoskey
  * Created:   January 27, 2025
- * Edited:    February 27, 2025
+ * Edited:    February 28, 2025
  */
-
 #include "Telemetry.h"
 extern craftState vehicle;
 
@@ -15,6 +14,7 @@ void Telemetry::serialIMU()
     Serial.print(vehicle.accel_g.x, 3); Serial.print(",");
     Serial.print(vehicle.accel_g.y, 3); Serial.print(",");
     Serial.println(vehicle.accel_g.z, 3);
+    Serial.flush(); // ensure buffer is sent
 }
 
 void Telemetry::serialIMUDeadReckoning() 
@@ -23,6 +23,7 @@ void Telemetry::serialIMUDeadReckoning()
     Serial.print(vehicle.deadReckoningPosition_m.x, 3); Serial.print(",");
     Serial.print(vehicle.deadReckoningPosition_m.y, 3); Serial.print(",");
     Serial.println(vehicle.deadReckoningPosition_m.z, 3);
+    Serial.flush();
 }
 
 void Telemetry::serialGyro() 
@@ -31,6 +32,7 @@ void Telemetry::serialGyro()
     Serial.print(vehicle.gyro_dps.x, 2); Serial.print(",");
     Serial.print(vehicle.gyro_dps.y, 2); Serial.print(",");
     Serial.println(vehicle.gyro_dps.z, 2);
+    Serial.flush();
 }
 
 void Telemetry::serialGyroDeadReckoning() 
@@ -39,6 +41,7 @@ void Telemetry::serialGyroDeadReckoning()
     Serial.print(vehicle.gyroAngle_deg.x, 2); Serial.print(",");
     Serial.print(vehicle.gyroAngle_deg.y, 2); Serial.print(",");
     Serial.println(vehicle.gyroAngle_deg.z, 2);
+    Serial.flush();
 }
 
 void Telemetry::serialMagnometer() 
@@ -47,6 +50,7 @@ void Telemetry::serialMagnometer()
     Serial.print(vehicle.mag_uT.x, 2); Serial.print(",");
     Serial.print(vehicle.mag_uT.y, 2); Serial.print(",");
     Serial.println(vehicle.mag_uT.z, 2);
+    Serial.flush();
 }
 
 void Telemetry::serialBarometer() 
@@ -55,6 +59,7 @@ void Telemetry::serialBarometer()
     Serial.print(vehicle.temperature_C, 2); Serial.print(",");
     Serial.print(vehicle.pressure_Pa, 2); Serial.print(",");
     Serial.println(vehicle.altitude_m, 2);
+    Serial.flush();
 }
 
 void Telemetry::serialServoOutputs() 
@@ -65,4 +70,5 @@ void Telemetry::serialServoOutputs()
     Serial.print(-vehicle.gyroAngle_deg.y, 2); Serial.print(",");
     Serial.print(vehicle.gyroAngle_deg.y, 2); Serial.print(",");
     Serial.println(vehicle.gyroAngle_deg.z / 90, 2);
+    Serial.flush();
 }
