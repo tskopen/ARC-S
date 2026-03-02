@@ -1,0 +1,93 @@
+digraph ARCS_FlightComputer {
+  rankdir=TB;  // top-to-bottom
+  fontsize=14;
+  labelloc=top;
+  label="ARC-S V5 Flight Computer – Mid-Level Overview";
+
+  node [shape=rounded, style=filled, fontname="Helvetica"];
+
+  // -------- Sensors --------
+  subgraph cluster_sensors {
+    label="Onboard Sensors Hardware";
+    color="#cfe2ff";
+    style=filled;
+    fillcolor="#e7f1ff";
+
+    IMU  [label="IMU\n(accel + gyro)", fillcolor="white"];
+    MAG  [label="Magnetometer",        fillcolor="white"];
+    BARO [label="Barometer\n(pressure + altitude)", fillcolor="white"];
+    GPS [label="GPS\n(Lat/Long + altitude)", fillcolor="white"];
+
+  }
+
+  // -------- Sensor Fusion / State Estimation --------
+  subgraph cluster_fusion {
+    label="Sensor Fusion & State Estimation\n(`sensorfusion.cpp` / `craftState`)";
+    color="#ffe5b4";
+    style=filled;
+    fillcolor="#fff2d9";
+
+    FUSION [label="Orientation\n(pitch, roll, yaw)\n+\nPosition / Velocity",
+            fillcolor="white"];
+  }
+
+  // -------- Flight Control --------
+  subgraph cluster_control {
+
+    
+    label="Flight Control";
+    color="#c8e6c9";
+    style=filled;
+    fillcolor="#e8f5e9";
+
+    LOOP [label="Control Loop\n(`flightCompV2.ino`)", fillcolor="white"];
+    PID  [label="PID Controllers\n(pitch, yaw, roll)\n(`PID.cpp`)", fillcolor="white"];
+    MIX  [label="Servo Mixer & Offsets\n(`servos.cpp`)", fillcolor="white"];
+  }
+
+  // -------- Actuators / Rocket --------
+  subgraph cluster_actuation {
+    label="Actuators";
+    color="#ffcdd2";
+    style=filled;
+    fillcolor="#ffebee";
+
+    SERVOS [label="TVG Servos\n(4 fins)", fillcolor="white"];
+    ROCKET [label="Rocket Body\n(ARC-S V5)", fillcolor="white"];
+  }
+
+  // -------- Telemetry & Logging --------
+  subgraph cluster_logging {
+    label="Telemetry & Logging";
+    color="#d1c4e9";
+    style=filled;
+    fillcolor="#ede7f6";
+
+    TEL    [label="Serial Telemetry\n(`telemetry.cpp`)", fillcolor="white"];
+    LOG    [label="Data Logging\n(SD card / flash)",     fillcolor="white"];
+    GROUND [label="Ground Computer\n(laptop for plots)", fillcolor="white"];
+  }
+
+  // Sensor data into fusion
+  IMU  -> FUSION;
+  MAG  -> FUSION;
+  BARO -> FUSION;
+  GPS  -> FUSION;
+  // Estimation into control
+  FUSION -> LOOP;
+  LOOP   -> PID;
+  PID    -> MIX;
+  MIX    -> SERVOS;
+  SERVOS -> ROCKET;
+  ROCKET -> IMU;
+  ROCKET -> MAG;
+  ROCKET -> BARO;
+  ROCKET -> GPS;
+
+  // Telemetry & logging taps
+  FUSION -> TEL [label="state\nestimates", fontsize=11];
+  PID    -> TEL [label="control\ncommands", fontsize=11];
+  FUSION -> LOG [label="flight data", fontsize=11];
+
+  TEL -> GROUND [label="USB serial CSV", fontsize=11];
+}
