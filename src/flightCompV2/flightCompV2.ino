@@ -23,6 +23,7 @@ extern craftState vehicle;
 void setup() 
 {
   delay(300);
+  Serial.setRxBufferSize(512);  // before begin(); reduces blocking when host is slow or disconnected
   Serial.begin(115200);
   delay(1000);
   
@@ -66,7 +67,11 @@ void setup()
 }
 
 const uint32_t LOOP_US = 1000; // 1 kHz
+const uint32_t PRINT = 100; // 0.1 kHz
+
 static uint32_t lastLoop = 0;
+static uint32_t lastLoopPrint = 0;
+
 uint32_t setupFinish = micros();
 void loop() 
 {
@@ -83,7 +88,16 @@ void loop()
 
     float dt = (now - lastLoop) * 1e-6;
     lastLoop = now;
-  
+  //There are errors with serial prints outside of a timed loop such as this... outputting serial to fast can result in errors and hanging the ESP32 controller
+  //BE VERY CAREFUL WHEN ADDING MORE SERIAL FUNCTIONS ON THE SAME TIMER AND IN SYNC
+  if (now - lastLoopPrint > PRINT)
+  {
+    telemetry.serialServoOutputs();
+    lastLoopPrint = now;
+  }
+
+
+
   readSerialAndUpdateServo();
 
   vehicle.readGAM();
@@ -116,7 +130,7 @@ void loop()
   }
 
     flightControlUpdate(dt);
-    telemetry.serialServoOutputs();
+
     delay(25);
 }
 

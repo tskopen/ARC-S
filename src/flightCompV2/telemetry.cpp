@@ -67,10 +67,9 @@ void Telemetry::serialServoOutputs()
 {
     // CSV format (deg): PITCH+Y,PITCH-Y,YAW+X,YAW-X
     // Uses the last commanded servo mix captured in applyServoMix()
+    // No flush() here: called every loop; blocking on flush when host isn't reading would stall the ESP32.
     Serial.print(lastServoCommand.posY, 2); Serial.print(",");   // PITCH+Y
     Serial.print(lastServoCommand.negY, 2); Serial.print(",");   // PITCH-Y
     Serial.print(lastServoCommand.posX, 2); Serial.print(",");   // YAW+X
     Serial.print(lastServoCommand.negX, 2); Serial.println();    // YAW-X
-
-    Serial.flush();
 }

@@ -99,19 +99,24 @@ void processCommand(String cmd)
   }
 }
 
+// Max command length to avoid unbounded growth if no newline (e.g. binary stream or noise).
+constexpr size_t MAX_SERIAL_INPUT_LEN = 64;
+
 void readSerialAndUpdateServo() 
 {
   while (Serial.available() > 0) 
   {
     char c = Serial.read();
     if (c == '\n') 
-    {    // End of input
+    {
       processCommand(inputString);
-      inputString = "";               // Clear for next command
+      inputString = "";
     } 
     else 
     {
-      inputString += c;
+      if (inputString.length() < MAX_SERIAL_INPUT_LEN)
+        inputString += c;
+      // else drop byte to prevent heap exhaustion
     }
   }
 }
