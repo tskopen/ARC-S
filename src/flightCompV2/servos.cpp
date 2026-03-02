@@ -8,7 +8,7 @@
 
 #include "servos.h"
 #include "sensorfusion.h"
-
+#include "PID.h"
 extern craftState vehicle;
 
 int initialOffset = 1500;
@@ -139,14 +139,8 @@ float mapGyroToServo(float angle, float minAngle, float maxAngle)
 }
 // Control Loop
 
-struct ServoMix {
-    float posX = 0.0f;
-    float negX = 0.0f;
-    float posY = 0.0f;
-    float negY = 0.0f;
-};
-
 ServoMix servoMix;
+ServoMix lastServoCommand;
 
 float clamp(float value, float minValue, float maxValue)
 {
@@ -155,36 +149,92 @@ float clamp(float value, float minValue, float maxValue)
     return value;
 }
 
-void flightControlUpdate()
+void flightControlUpdate(double dt)
 {
     servoMix = {};              // clear accumulator
-
-    pitchYawControlLoop();      // add pitch + yaw
-    rollControlLoop();          // add roll
+    
+    pitchControlLoop(dt);
+    yawControlLoop(dt);      // add pitch + yaw
+    rollControlLoop(dt);          // add roll
 
     applyServoMix();            // send once
 }
 
-void pitchYawControlLoop()
+static PIDController pitchPid;
+
+void initPitchController()
 {
-    float pitchCmd = vehicle.gyroAngle_deg.y * KP_PITCH;
-    float yawCmd   = vehicle.gyroAngle_deg.x * KP_YAW;
+    // Output and integral limits are in "servo command degrees"
+    const float out_min = -SERVO_LIMIT_DEG;
+    const float out_max =  SERVO_LIMIT_DEG;
+
+    const float i_min = -SERVO_LIMIT_DEG;
+    const float i_max =  SERVO_LIMIT_DEG;
+
+    pid_init(&pitchPid, KP_ROLL, KI_ROLL, KD_ROLL, out_min, out_max, i_min, i_max);
+}
+
+void pitchControlLoop(double dt)
+{
+    int pitchSetpoint = 0;
+    double pitchOrientation = vehicle.gyroAngle_deg.x;
+
+    double pitchCmd = pid_update(&pitchPid, pitchSetpoint, pitchOrientation, dt);
 
     // Pitch → Y-axis servos
-    servoMix.posY +=  pitchCmd;
+    servoMix.posY += pitchCmd;
     servoMix.negY += pitchCmd;
+}
+
+static PIDController yawPid;
+
+void initYawController()
+{
+    // Output and integral limits are in "servo command degrees"
+    const float out_min = -SERVO_LIMIT_DEG;
+    const float out_max =  SERVO_LIMIT_DEG;
+
+    const float i_min = -SERVO_LIMIT_DEG;
+    const float i_max =  SERVO_LIMIT_DEG;
+
+    pid_init(&yawPid, KP_ROLL, KI_ROLL, KD_ROLL, out_min, out_max, i_min, i_max);
+}
+
+void yawControlLoop(double dt)
+{
+    int yawSetpoint = 0;
+    double yawOrientation = vehicle.gyroAngle_deg.y;
+
+    double yawCmd = pid_update(&yawPid, yawSetpoint, yawOrientation, dt);
 
     // Yaw → X-axis servos
     servoMix.posX += yawCmd;
     servoMix.negX +=  yawCmd;
 }
 
-void rollControlLoop()
+static PIDController rollPid;
+
+void initRollController()
 {
-    float rollCmd = (vehicle.gyroAngle_deg.z / 90.0f) * KP_ROLL;
+    // Output and integral limits are in "servo command degrees"
+    const float out_min = -SERVO_LIMIT_DEG;
+    const float out_max =  SERVO_LIMIT_DEG;
+
+    const float i_min = -SERVO_LIMIT_DEG;
+    const float i_max =  SERVO_LIMIT_DEG;
+
+    pid_init(&rollPid, KP_ROLL, KI_ROLL, KD_ROLL, out_min, out_max, i_min, i_max);
+}
+void rollControlLoop(double dt)
+{
+    int rollRateSetpoint = 0;
+    double rollRateMeasurement = vehicle.gyro_dps.z;
+
+    double rollCmd = pid_update(&rollPid, rollRateSetpoint, rollRateMeasurement, dt);
+
 
     servoMix.posX += rollCmd;
-    servoMix.negX += rollCmd;
+    servoMix.negX -= rollCmd;
 }
 
 void applyServoMix()
@@ -194,6 +244,9 @@ void applyServoMix()
     servoMix.negX = clamp(servoMix.negX, -SERVO_LIMIT_DEG, SERVO_LIMIT_DEG);
     servoMix.posY = clamp(servoMix.posY, -SERVO_LIMIT_DEG, SERVO_LIMIT_DEG);
     servoMix.negY = clamp(servoMix.negY, -SERVO_LIMIT_DEG, SERVO_LIMIT_DEG);
+
+    // Save commanded mix for telemetry before sending / resetting
+    lastServoCommand = servoMix;
 
     // Send to servos
     ControlServo("+X", servoMix.posX);

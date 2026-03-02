@@ -54,8 +54,10 @@ double pid_update(PIDController *pid, double setpoint, double measurement, doubl
     
     //Output for PID controller
     //see https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller#Control_loop_example
-    // Control function u(t) is Error, intergral, and derivative multiplayed by their gain proportations and then added up
+    // Control function u(t) is Error, integral, and derivative multiplayed by their gain proportations and then added up
     double output = (pid->Kp * error) + (pid->Ki * pid->integral) + pid->Kd * derivative;
 
+    //return current error as prev error for next lop
+    pid->prev_error = error;
     return output;
 }

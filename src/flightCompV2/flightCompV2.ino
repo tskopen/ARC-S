@@ -60,7 +60,9 @@ void setup()
   //Calibrate sensors
   vehicle.readGAM();
   vehicle.calibrateGyroBias();
-
+  initRollController();
+  initYawController();
+  initPitchController();
 }
 
 const uint32_t LOOP_US = 1000; // 1 kHz
@@ -113,9 +115,8 @@ void loop()
     vehicle.duringFlightOrientationTracking(dt);
   }
 
-    flightControlUpdate();
-
-    telemetry.serialGyro();
+    flightControlUpdate(dt);
+    telemetry.serialServoOutputs();
     delay(25);
 }
 
