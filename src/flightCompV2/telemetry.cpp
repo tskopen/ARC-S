@@ -6,6 +6,7 @@
  * Edited:    February 28, 2025
  */
 #include "Telemetry.h"
+#include "servos.h"
 extern craftState vehicle;
 
 void Telemetry::serialIMU() 
@@ -64,11 +65,12 @@ void Telemetry::serialBarometer()
 
 void Telemetry::serialServoOutputs() 
 {
-    // CSV format: PITCH+Y,PITCH-Y,YAW+X,YAW-X,ROLL
-    Serial.print(vehicle.gyroAngle_deg.x, 2); Serial.print(",");
-    Serial.print(-vehicle.gyroAngle_deg.x, 2); Serial.print(",");
-    Serial.print(-vehicle.gyroAngle_deg.y, 2); Serial.print(",");
-    Serial.print(vehicle.gyroAngle_deg.y, 2); Serial.print(",");
-    Serial.println(vehicle.gyroAngle_deg.z / 90, 2);
+    // CSV format (deg): PITCH+Y,PITCH-Y,YAW+X,YAW-X
+    // Uses the last commanded servo mix captured in applyServoMix()
+    Serial.print(lastServoCommand.posY, 2); Serial.print(",");   // PITCH+Y
+    Serial.print(lastServoCommand.negY, 2); Serial.print(",");   // PITCH-Y
+    Serial.print(lastServoCommand.posX, 2); Serial.print(",");   // YAW+X
+    Serial.print(lastServoCommand.negX, 2); Serial.println();    // YAW-X
+
     Serial.flush();
 }

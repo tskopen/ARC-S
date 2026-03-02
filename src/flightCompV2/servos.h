@@ -38,6 +38,17 @@ struct AxisServo
   }
 };
 
+// High-level commanded angles (deg) for each servo axis
+struct ServoMix {
+    float posX = 0.0f;
+    float negX = 0.0f;
+    float posY = 0.0f;
+    float negY = 0.0f;
+};
+
+// Last commanded servo mix, kept for telemetry
+extern ServoMix lastServoCommand;
+
 //UTIL
 inline int clampServoUs(int us);
 void loadOffsetsFromEEPROM();
@@ -54,11 +65,23 @@ const float KP_PITCH = 0.9f;
 const float KP_YAW   = 0.9f;
 const float KP_ROLL  = 0.5f;
 
+const float KI_ROLL  = 0.0f;
+const float KD_ROLL  = 0.02f;
+
 const float SERVO_LIMIT_DEG = 60.0f;   // mechanical authority
 
-void flightControlUpdate();
-void pitchYawControlLoop();
-void rollControlLoop();
+void flightControlUpdate(double dt);
+
+void pitchControlLoop(double dt);
+void initPitchController();
+
+void yawControlLoop(double dt);
+void initYawController();
+
+void rollControlLoop(double dt);
+void initRollController();
+
+
 void applyServoMix();
 
 extern const int NUM_SERVOS;
