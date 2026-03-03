@@ -1,6 +1,6 @@
 digraph ARCS_FlightComputer {
-  rankdir=TB;  // top-to-bottom
-  fontsize=14;
+  rankdir=LR;
+  fontsize=20;
   labelloc=top;
   label="ARC-S V5 Flight Computer – Mid-Level Overview";
 
@@ -85,9 +85,9 @@ digraph ARCS_FlightComputer {
   ROCKET -> GPS;
 
   // Telemetry & logging taps
-  FUSION -> TEL [label="state\nestimates", fontsize=11];
-  PID    -> TEL [label="control\ncommands", fontsize=11];
-  FUSION -> LOG [label="flight data", fontsize=11];
+  FUSION -> TEL [label="state\nestimates", fontsize=16];
+  PID    -> TEL [label="control\ncommands", fontsize=16];
+  FUSION -> LOG [label="flight data", fontsize=16];
 
-  TEL -> GROUND [label="USB serial CSV", fontsize=11];
+  TEL -> GROUND [label="USB serial CSV", fontsize=16];
 }
