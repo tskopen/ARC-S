@@ -22,7 +22,7 @@ extern craftState vehicle;
 
 void setup() 
 {
-  delay(300);
+  delay(3000);
   Serial.setRxBufferSize(512);  // before begin(); reduces blocking when host is slow or disconnected
   Serial.begin(115200);
   delay(1000);
@@ -33,7 +33,7 @@ void setup()
 
   Wire.begin(I2C_SDA, I2C_SCL);
   Wire.setClock(50000);
-  Wire.setTimeout(100);
+  Wire.setTimeout(200);
 
   delay(100);
 
