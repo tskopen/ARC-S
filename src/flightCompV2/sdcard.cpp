@@ -29,5 +29,21 @@ void setupSDCard()
     {
         Serial.println("SD card ready");
     }
+    
+    myFile = SD.open("FlightLog.txt", FILE_WRITE);
 }
 
+
+
+void writeToSDCard()
+{
+  if (myFile) {
+    Serial.println("Writing to data.txt...");
+    myFile.println("Hello, this is a test log.");
+    myFile.println("Arduino SD Card Write Example");
+    myFile.close();
+    Serial.println("Data written successfully!");
+  } else {
+    Serial.println("Error opening data.txt!");
+  }
+}
