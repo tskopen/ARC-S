@@ -7,6 +7,7 @@
  */
 
 #include "servos.h"
+#include "sdcard.h"
 #include "sensorfusion.h"
 #include "PID.h"
 extern craftState vehicle;

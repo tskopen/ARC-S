@@ -6,8 +6,9 @@
  * Edited:    February 28, 2025
  */
 #include "Telemetry.h"
-#include "servos.h"
 extern craftState vehicle;
+
+/***** SERIAL TELEMETRY COMMANDS *****/
 
 void Telemetry::serialIMU() 
 {
@@ -72,4 +73,52 @@ void Telemetry::serialServoOutputs()
     Serial.print(lastServoCommand.negY, 2); Serial.print(",");   // PITCH-Y
     Serial.print(lastServoCommand.posX, 2); Serial.print(",");   // YAW+X
     Serial.print(lastServoCommand.negX, 2); Serial.println();    // YAW-X
+}
+
+
+/***** SD CARD TELEMETRY COMMANDS *****/
+
+void Telemetry::logAllSensors(File &telemetryFile) 
+{
+    // Timestamp in milliseconds
+    telemetryFile.print(millis()); telemetryFile.print(",");
+
+    // Accelerometer (g)
+    telemetryFile.print(vehicle.accel_g.x, 3); telemetryFile.print(",");
+    telemetryFile.print(vehicle.accel_g.y, 3); telemetryFile.print(",");
+    telemetryFile.print(vehicle.accel_g.z, 3); telemetryFile.print(",");
+
+    // Gyro (deg/sec)
+    telemetryFile.print(vehicle.gyro_dps.x, 2); telemetryFile.print(",");
+    telemetryFile.print(vehicle.gyro_dps.y, 2); telemetryFile.print(",");
+    telemetryFile.print(vehicle.gyro_dps.z, 2); telemetryFile.print(",");
+
+    // Vehicle Angle (Euler)
+    Serial.print(vehicle.gyroAngle_deg.x, 2); Serial.print(",");
+    Serial.print(vehicle.gyroAngle_deg.y, 2); Serial.print(",");
+    Serial.println(vehicle.gyroAngle_deg.z, 2);
+
+    // Dead reckoning position (m)
+    telemetryFile.print(vehicle.deadReckoningPosition_m.x, 3); telemetryFile.print(",");
+    telemetryFile.print(vehicle.deadReckoningPosition_m.y, 3); telemetryFile.print(",");
+    telemetryFile.print(vehicle.deadReckoningPosition_m.z, 3); telemetryFile.print(",");
+
+    // Magnetometer (uT)
+    telemetryFile.print(vehicle.mag_uT.x, 2); telemetryFile.print(",");
+    telemetryFile.print(vehicle.mag_uT.y, 2); telemetryFile.print(",");
+    telemetryFile.print(vehicle.mag_uT.z, 2); telemetryFile.print(",");
+
+    // Barometer
+    telemetryFile.print(vehicle.temperature_C, 2); telemetryFile.print(",");
+    telemetryFile.print(vehicle.pressure_Pa, 2); telemetryFile.print(",");
+    telemetryFile.print(vehicle.altitude_m, 2); telemetryFile.print(",");
+
+    // Servo outputs (deg)
+    telemetryFile.print(lastServoCommand.posY, 2); telemetryFile.print(",");
+    telemetryFile.print(lastServoCommand.negY, 2); telemetryFile.print(",");
+    telemetryFile.print(lastServoCommand.posX, 2); telemetryFile.print(",");
+    telemetryFile.println(lastServoCommand.negX, 2); // end of line
+
+    // Flush to SD card (can buffer in-flight for speed)
+    telemetryFile.flush();
 }
