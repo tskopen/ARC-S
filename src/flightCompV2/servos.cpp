@@ -188,7 +188,7 @@ void pitchControlLoop(double dt)
 
     // Pitch → Y-axis servos
     servoMix.posY += pitchCmd;
-    servoMix.negY += pitchCmd;
+    servoMix.negY -= pitchCmd;
 }
 
 static PIDController yawPid;
