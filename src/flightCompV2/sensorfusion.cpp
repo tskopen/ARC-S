@@ -121,9 +121,12 @@ void craftState::readGAM()
   }
   //WHERE YOU SWITCH OUT AXIS's BASED ON SENSOR POSITION, What is Vehicle's X compared to the senors X? Is Sensors X really Vehicles Y?
   //CONFORM TO VEHICLE.
-  vehicle.accel_g.x = ax;
-  vehicle.accel_g.y = ay;
-  vehicle.accel_g.z = az;
+  // X = roll, Y = Pitch, Z = Yaw
+  // For LSMSOX, Z is the sensors UP, Y is Forward with marker on top left, X is Y's right hand side.
+  // ARC-S, USB is down with board rotated 90 degrees, so Y is up, X is right, and Y is facing out the side.
+  vehicle.accel_g.x = ay;
+  vehicle.accel_g.y = az;
+  vehicle.accel_g.z = ay;
 
   vehicle.gyro_dps.x = gx - gyro_bias_dps.x; //See bias function, remove gyro basis due too... whatever external consistent factors...
   vehicle.gyro_dps.y = gy - gyro_bias_dps.y;
