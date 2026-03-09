@@ -70,6 +70,7 @@ void writeToSDCard()
     if (dataFile) 
     {
       telemetry.logAllSensors(dataFile);
+      dataFile.close();
     } 
     else 
     {
