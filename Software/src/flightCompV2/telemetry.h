@@ -10,6 +10,8 @@
 #include <Arduino.h>
 #include <BMP388_DEV.h>
 #include "sensorfusion.h"
+#include "servos.h"
+#include <SD.h>
 
 class Telemetry {
 public:
@@ -20,5 +22,6 @@ public:
     void serialMagnometer();
     void serialBarometer();
     void serialServoOutputs();
+    void logAllSensors(File &telemetryFile);
 };
 

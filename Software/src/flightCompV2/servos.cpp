@@ -7,6 +7,7 @@
  */
 
 #include "servos.h"
+#include "sdcard.h"
 #include "sensorfusion.h"
 #include "PID.h"
 extern craftState vehicle;
@@ -70,7 +71,7 @@ void processCommand(String cmd)
     return;
   }
 
-  int spaceIndex = cmd.indexOf(' ');
+  int spaceIndex = cmd.indexOf(" ");
   if (spaceIndex == -1) 
   {
     Serial.println("Invalid command. Use: ServoName Offset");
