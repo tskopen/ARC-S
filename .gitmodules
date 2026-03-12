@@ -1,0 +1,3 @@
+[submodule "Kicad-ARCS"]
+	path = Kicad-ARCS
+	url = https://github.com/tskopen/Kicad-ARCS.git
