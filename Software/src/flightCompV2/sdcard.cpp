@@ -9,26 +9,38 @@
 extern Telemetry telemetry;
 
 
-#define SDCardCS    18
+#define SDCardCS    18 // DAT3 as chip select
 #define SDCardCLK   35
-#define SDCardMISO  12
-#define SDCardMOSI  16
+#define SDCardMISO  19 // DAT0
+#define SDCardMOSI  8 // CMD
 
 File dataFile;
-const int chipSelect = 10;  // CS pin for SD module
 
-void initializeSDCard() {
- 
-  if (!SD.begin(chipSelect)) 
+void initializeSDCard() 
+{
+  
+  SPI.begin(SDCardCLK, SDCardMISO, SDCardMOSI);
+
+  pinMode(SDCardCS, OUTPUT);
+  digitalWrite(SDCardCS, HIGH);
+
+  // Send 80 dummy clocks to int SD card as per spec
+  for (int i = 0; i < 10; i++) {
+    SPI.transfer(0xFF);
+  }
+
+  const uint32_t sdClock = 400000;
+
+  if (!SD.begin(SDCardCS, SPI, sdClock))
   {
     Serial.println("SD card initialization failed!");
   }
   else
   {
-  Serial.println("SD card ready.");
+    Serial.println("SD card ready.");
   }
   // Try creating or opening the file
-  dataFile = SD.open("log.csv", FILE_WRITE);
+  dataFile = SD.open("/log.csv", FILE_WRITE);
 
   if (dataFile) 
   {

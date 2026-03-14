@@ -12,8 +12,7 @@
 #define FLASH_MISO  37
 #define FLASH_MOSI  34
 
-SPIClass spiFlash(HSPI);
-
+/*
 void setupFlash()
 {
     pinMode(FLASH_CS, OUTPUT);
@@ -55,4 +54,4 @@ void logData(float roll, float pitch, float yaw, float alt)
         millis(), roll, pitch, yaw, alt);
 
     file.close();
-}
+}*/
