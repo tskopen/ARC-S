@@ -13,6 +13,6 @@
 #include <SPI.h>
 #include <SD.h>
 
-void setupSDCard();
+void initializeSDCard();
 
-void dataLogSDCard(const char *logFile, const char *data);
+void writeToSDCard();

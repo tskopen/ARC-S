@@ -12,6 +12,8 @@
 #include "flash.h"
 #include "sdcard.h"
 #include "PID.h"
+
+
 Telemetry telemetry;
 
 #define SerialPort Serial
@@ -22,7 +24,7 @@ extern craftState vehicle;
 
 void setup() 
 {
-  delay(3000);
+  delay(1000);
   Serial.setRxBufferSize(512);  // before begin(); reduces blocking when host is slow or disconnected
   Serial.begin(115200);
   delay(1000);
@@ -46,10 +48,8 @@ void setup()
     Serial.println(error);
   }
 
-  SPI.begin();
-
   vehicle.initalizeSensors();
-
+  
   for (int i = 0; i < NUM_SERVOS; i++) 
   {
     servos[i].init_servo();
@@ -58,12 +58,16 @@ void setup()
   loadOffsetsFromEEPROM();  // restore trims on startup
   Serial.println("Servo system ready.");
 
+  initializeSDCard();
+
   //Calibrate sensors
   vehicle.readGAM();
   vehicle.calibrateGyroBias();
   initRollController();
   initYawController();
   initPitchController();
+
+  writeToSDCard();
 }
 
 const uint32_t LOOP_US = 1000; // 1 kHz
@@ -131,7 +135,7 @@ void loop()
 
     flightControlUpdate(dt);
 
-    delay(25);
+    delay(250);
 }
 
  
