@@ -10,3 +10,9 @@
 
 
 void setupFlash();
+void logData(float roll, float pitch, float yaw, float alt);
+void closeFlash();
+void startLogging();
+void transmitLogs();
+
+

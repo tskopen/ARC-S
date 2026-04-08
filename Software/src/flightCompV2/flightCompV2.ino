@@ -13,7 +13,6 @@
 #include "sdcard.h"
 #include "PID.h"
 
-
 Telemetry telemetry;
 
 #define SerialPort Serial
@@ -66,8 +65,8 @@ void setup()
   initRollController();
   initYawController();
   initPitchController();
+  setupFlash();
 
-  writeToSDCard();
 }
 
 const uint32_t LOOP_US = 1000; // 1 kHz
@@ -100,8 +99,6 @@ void loop()
     lastLoopPrint = now;
   }
 
-
-
   readSerialAndUpdateServo();
 
   vehicle.readGAM();
@@ -131,11 +128,20 @@ void loop()
   {
     vehicle.duringFlightPositionalTracking(dt);
     vehicle.duringFlightOrientationTracking(dt);
+
+    startLogging();
+    logData(vehicle.roll, vehicle.pitch, vehicle.yaw, vehicle.altitude_m);
   }
+
+  if (vehicle.landed == true) 
+  {
+    closeFlash();
+  }
+
 
     flightControlUpdate(dt);
 
-    delay(250);
+    delay(50);
 }
 
  
