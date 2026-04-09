@@ -76,6 +76,9 @@ static uint32_t lastLoop = 0;
 static uint32_t lastLoopPrint = 0;
 
 uint32_t setupFinish = micros();
+
+bool run_once = false
+
 void loop() 
 {
 
@@ -126,10 +129,18 @@ void loop()
 
   if (vehicle.launch == true) 
   {
+    
+    if (bool run_once = false)
+    {
+      uint32_t since_launch = micros();
+      startLogging();
+      
+      run_once = true;
+    }
+
     vehicle.duringFlightPositionalTracking(dt);
     vehicle.duringFlightOrientationTracking(dt);
 
-    startLogging();
     logData(vehicle.roll, vehicle.pitch, vehicle.yaw, vehicle.altitude_m);
   }
 
