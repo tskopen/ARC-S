@@ -30,15 +30,20 @@ void initializeSDCard()
   }
 
   const uint32_t sdClock = 400000;
-
-  if (!SD.begin(SDCardCS, SPI, sdClock))
-  {
-    Serial.println("SD card initialization failed!");
-  }
-  else
-  {
-    Serial.println("SD card ready.");
-  }
+    bool sdReady = false;
+ while (!sdReady) 
+    {
+        if (SD.begin(SDCardCS, SPI, sdClock)) 
+        {
+            Serial.println("SD card ready.");
+            sdReady = true;
+        } 
+        else 
+        {
+            Serial.println("SD card initialization failed! Retrying in 1 second...");
+            delay(1000);  // Wait before retrying
+        }
+    }
   // Try creating or opening the file
   dataFile = SD.open("/log.csv", FILE_WRITE);
 
