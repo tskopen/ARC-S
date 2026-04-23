@@ -55,6 +55,10 @@ public:
     bool apogee = false;
     bool landed = false;
 
+    double expectedTimeToApogee = 6;
+    double expectedTimeTolanding = 6;
+
+
     void initalizeSensors();
     void readGAM();
     void duringFlightOrientationTracking(double dt);
@@ -64,6 +68,8 @@ public:
     void readBarometerData();
     void computeGravityWhileStationary();
     void calibrateGyroBias();
+    bool hasLanded(float altitude, float verticalSpeed);
+
 };
 
 // Global constants and objects declared as extern

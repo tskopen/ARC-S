@@ -24,6 +24,22 @@
   float gx = 0, gy = 0, gz = 0;
   float t = 0, p = 0, a = 0;
 
+// Simple landed detection
+bool craftState::hasLanded(float altitude, float verticalSpeed) 
+{
+    // Parameters you can tweak
+    const float LAND_ALT_THRESHOLD = 0.2;  // meters, near ground
+    const float LAND_VEL_THRESHOLD = 0.1;  // m/s, nearly stopped
+
+    // Landed if near ground AND vertical velocity is very small
+    if (altitude < LAND_ALT_THRESHOLD && fabs(verticalSpeed) < LAND_VEL_THRESHOLD)
+    {
+        return true;
+    }
+    return false;
+}
+
+
 void craftState::initalizeSensors()
 {
   bmp388.begin();                                 // Default initialisation, place the BMP388 into SLEEP_MODE
