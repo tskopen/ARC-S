@@ -57,7 +57,6 @@ void setup()
   loadOffsetsFromEEPROM();  // restore trims on startup
   Serial.println("Servo system ready.");
 
-  initializeSDCard();
 
   //Calibrate sensors
   vehicle.readGAM();
