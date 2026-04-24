@@ -6,11 +6,13 @@
  * Edited:    Feb 26, 2025
  */
 
+
+
+
 #include "telemetry.h"
 #include <sensorfusion.h>
 #include <servos.h>
 #include "flash.h"
-#include "sdcard.h"
 #include "PID.h"
 
 Telemetry telemetry;
@@ -26,6 +28,7 @@ void setup()
   delay(1000);
   Serial.setRxBufferSize(512);  // before begin(); reduces blocking when host is slow or disconnected
   Serial.begin(115200);
+
   delay(1000);
   
   Serial.println("Serial OK");
@@ -57,6 +60,10 @@ void setup()
   loadOffsetsFromEEPROM();  // restore trims on startup
   Serial.println("Servo system ready.");
 
+<<<<<<< Updated upstream
+=======
+  //initializeSDCard();
+>>>>>>> Stashed changes
 
   //Calibrate sensors
   vehicle.readGAM();
@@ -97,7 +104,7 @@ void loop()
   //BE VERY CAREFUL WHEN ADDING MORE SERIAL FUNCTIONS ON THE SAME TIMER AND IN SYNC
   if (now - lastLoopPrint > PRINT)
   {
-    telemetry.serialServoOutputs();
+
     lastLoopPrint = now;
   }
 
@@ -147,7 +154,6 @@ void loop()
   {
     closeFlash();
   }
-
 
     flightControlUpdate(dt);
 
