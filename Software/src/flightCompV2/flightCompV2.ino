@@ -77,7 +77,7 @@ static uint32_t lastLoopPrint = 0;
 
 uint32_t setupFinish = micros();
 
-bool run_once = false
+bool run_once = false;
 
 void loop() 
 {

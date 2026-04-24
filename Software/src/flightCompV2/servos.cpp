@@ -8,6 +8,8 @@
 
 #include "servos.h"
 #include "sdcard.h"
+#include "flash.h"
+
 #include "sensorfusion.h"
 #include "PID.h"
 extern craftState vehicle;
@@ -72,25 +74,31 @@ void processCommand(String cmd)
   }
 
   int spaceIndex = cmd.indexOf(" ");
-  if (spaceIndex == -1) 
+
+  String prefix = cmd.substring(0, spaceIndex);
+
+  if (prefix == "TRANSFER_DATA")
+  {
+    transmitLogs();
+  }
+  else
   {
     Serial.println("Invalid command. Use: ServoName Offset");
     return;
   }
 
-  String servoName = cmd.substring(0, spaceIndex);
   String offsetStr = cmd.substring(spaceIndex + 1);
   int newOffset = offsetStr.toInt();
 
   bool found = false;
   for (int i = 0; i < NUM_SERVOS; i++) 
   {
-    if (servos[i].name == servoName) 
+    if (servos[i].name == prefix) 
     {
       servos[i].offset = newOffset;  // Update offset
       servos[i].servo.writeMicroseconds(clampServoUs(newOffset));  // Move servo
       Serial.print("Updated ");
-      Serial.print(servoName);
+      Serial.print(prefix);
       Serial.print(" to offset ");
       Serial.println(newOffset);
       writeServoOffsetEEPROM(i);                    // Save to EEPROM
