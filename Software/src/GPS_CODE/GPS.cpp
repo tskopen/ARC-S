@@ -23,11 +23,14 @@ void GPSClass::rawNMEAOutput()
       if (b < 0) break;
 
       // Build NMEA line until newline
-      if (b == '\n') {
+      if (b == '\n') 
+      {
         // trim possible '\r'
-        if (lineBuffer.length() && lineBuffer.charAt(lineBuffer.length() - 1) == '\r') {
+        if (lineBuffer.length() && lineBuffer.charAt(lineBuffer.length() - 1) == '\r') 
+        {
           lineBuffer.remove(lineBuffer.length() - 1);
         }
+
         // Print timestamp + NMEA sentence
         Serial.print("[");
         Serial.print(millis());
@@ -39,7 +42,8 @@ void GPSClass::rawNMEAOutput()
       {
         lineBuffer += (char)b;
         // prevent runaway buffer
-        if (lineBuffer.length() > 120) {
+        if (lineBuffer.length() > 120) 
+        {
           // print partial line with notice and reset
           Serial.print("[");
           Serial.print(millis());
